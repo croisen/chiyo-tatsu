@@ -15,63 +15,104 @@
 #define SET_BINARY_MODE(file)
 #endif
 
-void tachiyomi_gzip_load(unsigned char **input_uncompressed,
-                         const char *filename)
+#define CHUNK 131072
+
+void tachiyomi_gzip_load(const char *filename,
+                         unsigned char **input_uncompressed)
 {
-    FILE *fp = fopen(filename, "rb");
-    if (fp == NULL)
+    FILE *tachiyomi_bk = fopen(filename, "rb");
+    if (tachiyomi_bk == NULL)
     {
-        __bread_panic("Error reading file %s\n", filename);
+        __bread_panic("Cannot open tachiyomi backup %s, LINE: %d\n", filename,
+                      __LINE__);
     }
 
-    gzFile compressed_file = gzdopen(fileno(fp), "r");
-    fseek(fp, 0, SEEK_END);
-    size_t compressed_size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    int ret        = 0;
+    unsigned have  = 0;
+    unsigned iters = 1;
 
-    /*const unsigned char *compressed_data =*/
-    /*__bread_calloc(compressed_size + 1, sizeof(unsigned char));*/
-    /*if (compressed_data == NULL)*/
-    /*{*/
-    /*gzclose(compressed_file);*/
-    /*fclose(fp);*/
-    /*__bread_panic(*/
-    /*"Cannot allocate memory to store the tachiyomi backup data\n");*/
-    /*}*/
-    input_uncompressed[0] =
-        __bread_calloc((compressed_size * 5) + 1, sizeof(unsigned char));
-    if (input_uncompressed[0] == NULL)
+    z_stream strm  = {0};
+    unsigned char in[CHUNK];
+    unsigned char out[CHUNK];
+
+    if (inflateInit(&strm) != Z_OK)
     {
         __bread_panic(
-            "Cannot allocate memory to store the tachiyomi backup data\n");
+            "Cannot decompress the tachiyomi input file %s, LINE: %d\n",
+            filename, __LINE__);
     }
 
-    size_t uncompressed_size = (compressed_size * 5) * sizeof(unsigned char);
-
-    if (gzwrite(compressed_file, input_uncompressed[0], uncompressed_size) == 0)
+    do
     {
-        gzclose(compressed_file);
-        fclose(fp);
-        __bread_panic(
-            "Wasn't able to get anything from the tachiyomi backup file\n");
-    }
+        strm.avail_in = fread(in, 1, CHUNK, tachiyomi_bk);
+        if (ferror(tachiyomi_bk))
+        {
+            (void)inflateEnd(&strm);
+            fclose(tachiyomi_bk);
+            __bread_panic("Error in decompressing file %s, LINE: %d\n",
+                          filename, __LINE__);
+        }
 
-    gzclose(compressed_file);
-    fclose(fp);
+        if (strm.avail_in == 0)
+            break;
+        strm.next_in = in;
 
-    /*int res = uncompress(input_uncompressed[0], &uncompressed_size,*/
-    /*compressed_data, compressed_size);*/
+        do
+        {
+            strm.avail_out = CHUNK;
+            strm.next_out  = out;
 
-    /*switch (res)*/
-    /*{*/
-    /*case Z_OK:*/
-    /*printf("OK\n");*/
-    /*break;*/
-    /*case Z_MEM_ERROR:*/
-    /*printf("Memory ERR\n");*/
-    /*break;*/
-    /*case Z_BUF_ERROR:*/
-    /*printf("Buffer error");*/
-    /*break;*/
-    /*}*/
+            ret            = inflate(&strm, Z_SYNC_FLUSH);
+            if (ret == Z_STREAM_ERROR)
+            {
+                (void)inflateEnd(&strm);
+                fclose(tachiyomi_bk);
+                __bread_panic("Error in decompressing file %s, LINE: %d\n",
+                              filename, __LINE__);
+            }
+
+            switch (ret)
+            {
+            case Z_NEED_DICT:
+                ret = Z_DATA_ERROR; /* and fall through */
+                printf("Need dict\n");
+            case Z_DATA_ERROR:
+                printf("Straight err\n");
+            case Z_MEM_ERROR:
+                printf("Then mem err\n");
+                (void)inflateEnd(&strm);
+                fclose(tachiyomi_bk);
+                __bread_panic("Error in decompressing file %s, LINE: %d\n",
+                              filename, __LINE__);
+            }
+
+            have = CHUNK - strm.avail_out;
+            unsigned char *new_size =
+                __bread_realloc(input_uncompressed[0], iters * CHUNK);
+            if (new_size == NULL)
+            {
+                (void)inflateEnd(&strm);
+                fclose(tachiyomi_bk);
+                __bread_panic("Error in decompressing file %s, LINE: %d\n",
+                              filename, __LINE__);
+            }
+
+            for (size_t i = ((iters - 1) * CHUNK); i < (iters * CHUNK); i += 1)
+            {
+                input_uncompressed[0][i] = '\0';
+            }
+
+            input_uncompressed[0] = new_size;
+            if (sprintf((char *)input_uncompressed[0] + strm.total_out - have,
+                        "%s", out))
+            {
+                (void)inflateEnd(&strm);
+                fclose(tachiyomi_bk);
+                __bread_panic("Error in decompressing file %s, LINE: %d\n",
+                              filename, __LINE__);
+            }
+
+            iters += 1;
+        } while (strm.avail_out == 0);
+    } while (ret != Z_STREAM_END);
 }

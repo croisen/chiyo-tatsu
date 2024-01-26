@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
     if (bread_parser_is_opt_used('i'))
     {
-        tachiyomi_gzip_load(input_uncompressed, bread_parser_get_arg('i', 0));
+        tachiyomi_gzip_load(bread_parser_get_arg('i', 0), input_uncompressed);
     }
 
     if (bread_parser_is_opt_used('o'))
