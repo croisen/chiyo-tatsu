@@ -1,3 +1,12 @@
 # Chiyo - Tatsu
 
 A backup file converter from Tachiyomi to Kotatsu (a very wip project)
+
+## Todo
+
+[x] Get my own header library commandline parser
+[x] Close the files when there's a sudden exit
+[x] Use make as a build system for other c files inside the others folder
+[ ] Parse the tachiyomi backup file
+[ ] Get the documentation for the kotatsu backup file
+[ ] Struggle converting between the two

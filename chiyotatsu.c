@@ -1,17 +1,36 @@
+#include <stdio.h>
+
+#include "others/args.h"
+#include "others/globals.h"
+
 #define CROI_LIB_BREAD_PARSER_IMPL_H
 #include "others/bread_parser.h"
 
+FILE *input  = NULL;
+FILE *output = NULL;
+
 int main(int argc, char **argv)
 {
-    bread_parser_add_option('i', "input", 1);
-    bread_parser_add_descrp('i', "Set a file as input");
-    bread_parser_opt_argmts('i', 1, BREAD_CHAR);
+    atexit(chiyo_tatsu_file_close_io);
 
-    bread_parser_add_option('o', "output", 1);
-    bread_parser_add_descrp('o', "Set a file as output");
-    bread_parser_opt_argmts('o', 1, BREAD_CHAR);
-
-    bread_print_args();
+    define_args();
     bread_parse(argc, argv);
+
+    if (bread_parser_is_opt_used('i'))
+    {
+        input = fopen((char *)bread_parser_get_arg('i', 0), "rb");
+        printf("File %s is the tachiyomi backup input\n",
+               (char *)bread_parser_get_arg('i', 0));
+    }
+
+    if (bread_parser_is_opt_used('o'))
+    {
+        output = fopen((char *)bread_parser_get_arg('o', 0), "wb");
+        printf("File %s is the kotatsu backup output\n",
+               (char *)bread_parser_get_arg('o', 0));
+    }
+
+    printf("Input: %p, Output: %p\n", (void *)input, (void *)output);
+
     return 0;
 }
