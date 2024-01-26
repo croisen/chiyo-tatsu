@@ -3,9 +3,7 @@
 
 #include <stdio.h>
 
-extern FILE *input;
-extern FILE *output;
-
-void chiyo_tatsu_file_close_io();
+extern unsigned char **input_uncompressed;
+extern unsigned char **output_compressed;
 
 #endif

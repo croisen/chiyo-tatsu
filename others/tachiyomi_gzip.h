@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 
-void tachiyomi_gzip_inflate(const char **compressed_bytes,
-                            const char **uncompressed_bytes);
+extern unsigned char **input_uncompressed;
 
-void tachiyomi_gzip_load(FILE *input, const char *filename);
-void tachiyomi_gzip_print(FILE *input);
+void tachiyomi_gzip_load(unsigned char **input_uncompressed,
+                         const char *filename);
+void tachiyomi_gzip_print(const unsigned char **input_uncompressed);
 
 #endif

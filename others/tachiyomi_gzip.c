@@ -4,6 +4,7 @@
 #include <string.h>
 #include <zlib.h>
 
+#include "bread_parser.h"
 #include "tachiyomi_gzip.h"
 
 #if defined(MSDOS) || defined(OS2) || defined(_WIN32) || defined(__CYGWIN__)
@@ -14,60 +15,63 @@
 #define SET_BINARY_MODE(file)
 #endif
 
-#define CHUNK 131072
-
-static volatile bool zlib_inflate_init = false;
-
-int zlib_deflate(FILE *source, FILE *dest)
+void tachiyomi_gzip_load(unsigned char **input_uncompressed,
+                         const char *filename)
 {
-    int ret = 0, flush = 0;
-    unsigned have;
-    z_stream strm;
-    unsigned char in[CHUNK];
-    unsigned char out[CHUNK];
-
-    strm.opaque = Z_NULL;
-    strm.zalloc = Z_NULL;
-    strm.zfree  = Z_NULL;
-
-    if (zlib_inflate_init == false)
+    FILE *fp = fopen(filename, "rb");
+    if (fp == NULL)
     {
-        ret               = inflateInit(&strm);
-        zlib_inflate_init = true;
+        __bread_panic("Error reading file %s\n", filename);
     }
 
-    if (ret != Z_OK)
+    gzFile compressed_file = gzdopen(fileno(fp), "r");
+    fseek(fp, 0, SEEK_END);
+    size_t compressed_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    /*const unsigned char *compressed_data =*/
+    /*__bread_calloc(compressed_size + 1, sizeof(unsigned char));*/
+    /*if (compressed_data == NULL)*/
+    /*{*/
+    /*gzclose(compressed_file);*/
+    /*fclose(fp);*/
+    /*__bread_panic(*/
+    /*"Cannot allocate memory to store the tachiyomi backup data\n");*/
+    /*}*/
+    input_uncompressed[0] =
+        __bread_calloc((compressed_size * 5) + 1, sizeof(unsigned char));
+    if (input_uncompressed[0] == NULL)
     {
-        return ret;
+        __bread_panic(
+            "Cannot allocate memory to store the tachiyomi backup data\n");
     }
 
-    do
+    size_t uncompressed_size = (compressed_size * 5) * sizeof(unsigned char);
+
+    if (gzwrite(compressed_file, input_uncompressed[0], uncompressed_size) == 0)
     {
-        strm.avail_in = fread(in, 1, CHUNK, source);
-        if (ferror(source))
-        {
-            (void)inflateEnd(&strm);
-            return Z_ERRNO;
-        }
+        gzclose(compressed_file);
+        fclose(fp);
+        __bread_panic(
+            "Wasn't able to get anything from the tachiyomi backup file\n");
+    }
 
-        flush        = feof(source) ? Z_FINISH : Z_NO_FLUSH;
-        strm.next_in = in;
+    gzclose(compressed_file);
+    fclose(fp);
 
-        do
-        {
-            strm.avail_out = CHUNK;
-            strm.next_out  = out;
+    /*int res = uncompress(input_uncompressed[0], &uncompressed_size,*/
+    /*compressed_data, compressed_size);*/
 
-            ret            = inflate(&strm, flush);
-            have           = CHUNK - strm.avail_out;
-            if (fwrite(out, 1, have, dest) != have || ferror(dest))
-            {
-                (void)inflateEnd(&strm);
-                return Z_ERRNO;
-            }
-        } while (strm.avail_out == 0);
-    } while (flush != Z_FINISH);
-
-    (void)inflateEnd(&strm);
-    return Z_OK;
+    /*switch (res)*/
+    /*{*/
+    /*case Z_OK:*/
+    /*printf("OK\n");*/
+    /*break;*/
+    /*case Z_MEM_ERROR:*/
+    /*printf("Memory ERR\n");*/
+    /*break;*/
+    /*case Z_BUF_ERROR:*/
+    /*printf("Buffer error");*/
+    /*break;*/
+    /*}*/
 }
