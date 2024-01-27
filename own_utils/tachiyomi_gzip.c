@@ -8,15 +8,7 @@
 #include "bread_parser.h"
 #include "tachiyomi_gzip.h"
 
-#if defined(MSDOS) || defined(OS2) || defined(_WIN32) || defined(__CYGWIN__)
-#include <fcntl.h>
-#include <io.h>
-#define SET_BINARY_MODE(file) setmode(fileno(file), O_BINARY)
-#else
-#define SET_BINARY_MODE(file)
-#endif
-
-#define CHUNK      131072
+#define CHUNK      524288
 #define WINDOWBITS 16
 
 size_t tachiyomi_gzip_load(const char *filename,

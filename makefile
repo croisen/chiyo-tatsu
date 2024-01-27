@@ -1,7 +1,8 @@
 CC				= cc
 CFLAGS			= -Wall -Wextra -Wpedantic -Werror
 NOWARN			= -Wno-implicit-fallthrough
-OPTS			= -O3 -g
+OPTS_DEBUG		= -Og -g
+OPTS_RELEASE	= -O3 -s --static
 LIBS			= -Iother_includes/ -Lother_includes/ -lz
 
 EXE				= chiyotatsu.exe
@@ -19,13 +20,20 @@ VALGRIND_OPTS	= --leak-check=full --show-leak-kinds=all --track-origins=yes
 all: clean ${EXE}
 other_libs: zlib
 
+debug: ${EXE} ${COMPONENTS_O} other_libs
+	${CC} ${CFLAGS} ${OPTS_DEBUG} -o $< ${MAIN} ${COMPONENTS_O} ${LIBS}\
+		${NOWARN}
+
 ${EXE}: ${COMPONENTS_O} other_libs
-	${CC} ${CFLAGS} ${OPTS} -o ${EXE} ${MAIN} ${COMPONENTS_O} ${LIBS} ${NOWARN}
+	${CC} ${CFLAGS} ${OPTS_RELEASE} -o $@ ${MAIN} ${COMPONENTS_O} ${LIBS}\
+		${NOWARN}
 
 ${COMPONENTS_O}:
 	${CC} ${CFLAGS} ${OPTS} -o $@ -c ${patsubst %.o,%.c,$@} ${NOWARN}
 
 zlib:
+	mkdir -p other_includes/
+	mkdir -p built_libs/remnants/$@
 	cd built_libs/remnants/$@; cmake ../../../other_libs/$@
 	$(MAKE) -C built_libs/remnants/$@
 	cp built_libs/remnants/$@/libz.so built_libs/
@@ -37,7 +45,7 @@ clean:
 	rm -f ${EXE}
 	rm -f ${COMPONENTS_O}
 
-test: clean ${EXE}
+test: clean debug
 ifdef VALGRIND
 	${VALGRIND} ${VALGRIND_OPTS} ./${EXE} -h
 else

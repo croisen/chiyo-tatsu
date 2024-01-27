@@ -1,7 +1,6 @@
-#include <signal.h>
+#include <inttypes.h>
 
 #include <stdio.h>
-#include <unistd.h>
 
 #include "own_utils/args.h"
 #include "own_utils/tachiyomi_gzip.h"
@@ -13,13 +12,13 @@ static volatile int run = 1;
 
 int main(int argc, char **argv)
 {
-    define_args();
-    bread_parse(argc, argv);
-
     unsigned char **input_uncompressed =
         __bread_calloc(1, sizeof(unsigned char *));
     unsigned char **output_compressed =
         __bread_calloc(1, sizeof(unsigned char *));
+
+    define_args();
+    bread_parse(argc, argv);
 
     if (bread_parser_is_opt_used('i'))
     {
@@ -27,8 +26,7 @@ int main(int argc, char **argv)
         printf("Trying to decompress %s\n", file_input);
         size_t i = tachiyomi_gzip_load(file_input, input_uncompressed) *
                    sizeof(unsigned char);
-        /*write(STDOUT_FILENO, *input_uncompressed, i);*/
-        printf("Size: %lu\n", i);
+        printf("Size: %" PRIu64 "\n", i);
     }
 
     if (bread_parser_is_opt_used('o'))

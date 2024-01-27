@@ -12,6 +12,8 @@
 #define CROI_LIB_BREAD_PARSER_H
 
 #include <assert.h>
+#include <inttypes.h>
+#include <math.h>
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -73,10 +75,7 @@ extern void bread_parser_add_option(char short_opt, char *long_opt,
 extern void bread_parser_add_descrp(char short_opt, char *description);
 extern void bread_parser_opt_argmts(char short_opt, size_t arg_count, ...);
 
-extern void __memtracker_init(void);
-extern void __memtracker_free_void(void);
-extern void __memtracker_free_sig(int dummy);
-
+extern void __bread_free(void *ptr);
 extern void *__bread_calloc(size_t nmemb, size_t size);
 extern void *__bread_malloc(size_t size);
 extern void *__bread_realloc(void *ptr, size_t size);
@@ -95,6 +94,12 @@ char *program_name = NULL;
 
 DA some_args       = {0};
 DA alloced_ptrs    = {0};
+
+extern int __memtracker_bs(void *ptr, size_t start, size_t end);
+extern int __memtracker_sort(const void *a, const void *b);
+extern void __memtracker_init(void);
+extern void __memtracker_free_void(void);
+extern void __memtracker_free_sig(int dummy);
 
 int __bread_args_compare(const void *a, const void *b)
 {
@@ -127,7 +132,33 @@ int __memtracker_sort(const void *a, const void *b)
     void *c = *(void **)a;
     void *d = *(void **)b;
 
+    // Sorted from highest to lowest
     return (size_t)d - (size_t)c;
+}
+
+int __memtracker_bs(void *ptr, size_t start, size_t end)
+{
+    size_t val1 = (size_t)ptr;
+    size_t half = (start + (end - 1)) / 2;
+    size_t val2 = (size_t)alloced_ptrs->ptrs[half];
+
+    if (end >= 1)
+    {
+        if (val1 == val2)
+        {
+            return half;
+        }
+        else if (val1 < val2)
+        {
+            return __memtracker_bs(ptr, half + 1, end);
+        }
+        else if (val1 > val2)
+        {
+            return __memtracker_bs(ptr, start, half - 1);
+        }
+    }
+
+    return -1;
 }
 
 void __memtracker_init(void)
@@ -321,16 +352,16 @@ bread_realloc_ret:
 
 void __bread_free(void *ptr)
 {
-    for (size_t i = 0; i < alloced_ptrs->used; i += 1)
-    {
-        if (alloced_ptrs->ptrs[i] == ptr)
-        {
-            alloced_ptrs->ptrs[i] = NULL;
-        }
-    }
-
     qsort(alloced_ptrs->ptrs, alloced_ptrs->used, sizeof(void *),
           __memtracker_sort);
+
+    int index = __memtracker_bs(ptr, 0, alloced_ptrs->used);
+    if (index != -1)
+    {
+        printf("Ptr: %p Searched: %p\n", ptr, alloced_ptrs->ptrs[index]);
+        alloced_ptrs->ptrs[index] = NULL;
+    }
+
     free(ptr);
     alloced_ptrs->used -= 1;
 }
@@ -344,10 +375,10 @@ void bread_print_args(void)
     for (size_t i = 0; i < some_args->used; i++)
     {
         ArgPtr x = ((ArgPtr)some_args->ptrs[i]);
-        size_t y = strlen(x->long_opt);
         if (x->long_opt != NULL)
         {
-            opt_len = (y > opt_len) ? y : opt_len;
+            size_t y = strlen(x->long_opt);
+            opt_len  = (y > opt_len) ? y : opt_len;
         }
     }
 
@@ -355,25 +386,30 @@ void bread_print_args(void)
     {
         ArgPtr x = ((ArgPtr)some_args->ptrs[i]);
         printf("\t-%c \t --%s", x->short_opt, x->long_opt);
+        if (x->long_opt != NULL)
+        {
+            for (size_t ii = 0; ii < (opt_len - strlen(x->long_opt)); ii += 1)
+            {
+                printf(" ");
+            }
+        }
 
         if (x->arg_type_list != NULL)
         {
-            if (x->long_opt != NULL)
+            if (x->descr != NULL)
             {
+                printf("\t %s\n", x->descr);
                 for (size_t ii  = 0; ii < (opt_len - strlen(x->long_opt));
                      ii        += 1)
                 {
                     printf(" ");
                 }
-            }
 
-            if (x->descr != NULL)
-            {
-                printf("\t %s\n\t\t\t\t={ ", x->descr);
+                printf("\t\t\t={ ");
             }
             else
             {
-                printf("\n\t\t\t\t={ ");
+                printf("={ ");
             }
 
             for (size_t iii = 0; iii < x->arg_count; iii += 1)
@@ -403,6 +439,11 @@ void bread_print_args(void)
         else if (x->descr != NULL)
         {
             printf("\t %s", x->descr);
+        }
+
+        if (x->short_opt == 'h')
+        {
+            printf("\n");
         }
 
         printf("\n");
@@ -663,8 +704,8 @@ size_t __bread_parse_opt_args(ArgPtr x, size_t offset, size_t argc, char **argv)
             if ((res == 0) && (strcmp(argv[offset + i], "0") != 0))
             {
                 fprintf(stderr,
-                        "Expecting a number argument for opt arg #%lu of %s, "
-                        "got \"%s\"\n",
+                        "Expecting a number argument for opt arg #%" PRIu64
+                        " of %s, got \"%s\"\n",
                         i, argv[offset], argv[offset + i]);
                 fprintf(
                     stderr,
@@ -696,7 +737,7 @@ size_t __bread_parse_opt_args(ArgPtr x, size_t offset, size_t argc, char **argv)
             {
                 fprintf(stderr,
                         "Expecting an unsigned number argument for "
-                        "opt arg #%lu of %s, got \"%s\"\n",
+                        "opt arg #%" PRIu64 " of %s, got \"%s\"\n",
                         i, argv[offset], argv[offset + i]);
                 fprintf(stderr,
                         "Expected arguments of opt %s in the order seen "
@@ -762,9 +803,6 @@ void bread_parse(int argc, char **argv)
 {
     bread_parser_add_option('h', "help", 0);
     bread_parser_add_descrp('h', "Prints this help option");
-
-    bread_parser_add_option('?', "help", 0);
-    bread_parser_add_descrp('?', "Prints this help option");
 
     if (argc > 1 && (argv[1][1] == 'h' || argv[1][1] == '?' ||
                      strcmp(&argv[1][2], "help") == 0))
@@ -872,7 +910,8 @@ void *bread_parser_get_arg(char short_opt, size_t index)
     if (index >= x->arg_count)
     {
         fprintf(stderr,
-                "Index %lu is higher than the arg count of short opt %c\n",
+                "Index %" PRIu64
+                " is higher than the arg count of short opt %c\n",
                 index, short_opt);
         return NULL;
     }
