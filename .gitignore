@@ -1,5 +1,12 @@
 eu.kanade.tachiyomi.debug_2024-01-22_05-54.tachibk
+eu.kanade.tachiyomi.debug_2024-01-22_05-54.tachibk.uncompressed
 kotatsu_26012024.bk.zip
+
+*.a
+*.so
+
+built_libs/remnants/*
+built_libs/remnants/*/
 
 chiyotatsu.exe
 *.o

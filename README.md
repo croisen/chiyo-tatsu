@@ -12,3 +12,7 @@ A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 -   [ ] Get the documentation for the kotatsu backup file
 -   [ ] Struggle converting between the two
 -   [ ] Struggle in writing the zip file backup of kotatsu
+
+## External Libraries Used
+
+-   [zlib](https://github.com/madler/zlib)
