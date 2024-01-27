@@ -16,5 +16,4 @@ A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 
 ## External Libraries Used
 
--   [protobuf-c](https://github.com/protobuf-c/protobuf-c)
 -   [zlib](https://github.com/madler/zlib)

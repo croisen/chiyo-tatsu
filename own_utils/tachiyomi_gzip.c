@@ -21,11 +21,10 @@ size_t tachiyomi_gzip_load(const char *filename,
                       __LINE__);
     }
 
-    int ret        = 0;
-    unsigned have  = 0;
-    unsigned iters = 1;
+    int ret       = 0;
+    unsigned have = 0;
 
-    z_stream strm  = {0};
+    z_stream strm = {0};
     unsigned char in[CHUNK];
     unsigned char out[CHUNK];
 
@@ -78,9 +77,8 @@ size_t tachiyomi_gzip_load(const char *filename,
                 printf("Decompressing: %s, Mem error\n", filename);
                 (void)inflateEnd(&strm);
                 fclose(tachiyomi_bk);
-                __bread_panic(
-                    "Error in decompressing file %s, LINE: %d, iter: %d\n",
-                    filename, __LINE__, iters);
+                __bread_panic("Error in decompressing file %s, LINE: %d\n",
+                              filename, __LINE__);
             }
 
             have                    = CHUNK - strm.avail_out;
@@ -95,17 +93,7 @@ size_t tachiyomi_gzip_load(const char *filename,
             }
 
             *input_uncompressed = new_size;
-            if (sprintf((char *)*input_uncompressed + strm.total_out - have,
-                        "%s", out) == 0)
-            {
-                (void)inflateEnd(&strm);
-                fclose(tachiyomi_bk);
-                __bread_panic(
-                    "Error in decompressing file %s, LINE: %d, iter :%d\n",
-                    filename, __LINE__, iters);
-            }
-
-            iters += 1;
+            memcpy(*input_uncompressed + strm.total_out - have, out, have);
         } while (strm.avail_out == 0);
     } while (ret != Z_STREAM_END);
 

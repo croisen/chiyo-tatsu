@@ -3,7 +3,8 @@ CFLAGS			= -Wall -Wextra -Wpedantic -Werror
 NOWARN			= -Wno-implicit-fallthrough
 OPTS_DEBUG		= -Og -g
 OPTS_RELEASE	= -O3 -s --static
-LIBS			= -Iother_includes/ -Lother_includes/ -lz
+LIBS			= -lz
+LIBS_DIR		= -L./built_libs -I./other_includes
 
 EXE				= chiyotatsu.exe
 MAIN			= chiyotatsu.c
@@ -11,22 +12,34 @@ MAIN			= chiyotatsu.c
 COMPONENTS_C	= ${wildcard own_utils/*.c}
 COMPONENTS_O	= ${patsubst %.c,%.o,${COMPONENTS_C}}
 
+OTHER_LIBS		= built_libs/libz.a
+
 VALGRIND		:= ${shell command -v valgrind 2>/dev/null}
 VALGRIND_OPTS	= --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 
-.PHONY: all clean test zlib
-
+.PHONY: all clean test debug other_libs
 all: clean ${EXE}
-other_libs: zlib
 
-debug: ${EXE} ${COMPONENTS_O} other_libs
-	${CC} ${CFLAGS} ${OPTS_DEBUG} -o $< ${MAIN} ${COMPONENTS_O} ${LIBS}\
-		${NOWARN}
+define rebuild_other_libs
+test -e ${1} || ${MAKE} ${1}
+endef
 
-${EXE}: ${COMPONENTS_O} other_libs
-	${CC} ${CFLAGS} ${OPTS_RELEASE} -o $@ ${MAIN} ${COMPONENTS_O} ${LIBS}\
-		${NOWARN}
+other_libs:
+	${foreach lib,${OTHER_LIBS},\
+		${call rebuild_other_libs,${lib}}\
+	}
+
+debug: clean ${COMPONENTS_O} other_libs
+	${CC} ${CFLAGS} ${NOWARN} ${OPTS_DEBUG} -o ${EXE} ${MAIN}\
+		${COMPONENTS_O}\
+		${LIBS} ${LIBS_DIR}
+
+${EXE}: clean ${COMPONENTS_O} other_libs
+	${CC} ${CFLAGS} ${NOWARN} ${OPTS_RELEASE} -o $@ ${MAIN}\
+		${COMPONENTS_O}\
+		${LIBS} ${LIBS_DIR}
+		
 
 ${COMPONENTS_O}:
 	${CC} ${CFLAGS} ${OPTS} -o $@ -c ${patsubst %.o,%.c,$@} ${NOWARN}
@@ -51,3 +64,6 @@ ifdef VALGRIND
 else
 	./${EXE} -h
 endif
+
+built_libs/libz.a: zlib
+built_libs/libprotobuf.a: protobuf-c

@@ -1,6 +1,3 @@
 [submodule "other_libs/zlib"]
 	path = other_libs/zlib
 	url = https://github.com/madler/zlib.git
-[submodule "other_libs/protobuf-c"]
-	path = other_libs/protobuf-c
-	url = https://github.com/protobuf-c/protobuf-c.git

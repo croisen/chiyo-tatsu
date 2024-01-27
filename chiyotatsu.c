@@ -1,6 +1,7 @@
 #include <inttypes.h>
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "own_utils/args.h"
 #include "own_utils/tachiyomi_gzip.h"
@@ -26,6 +27,7 @@ int main(int argc, char **argv)
         printf("Trying to decompress %s\n", file_input);
         size_t i = tachiyomi_gzip_load(file_input, input_uncompressed) *
                    sizeof(unsigned char);
+        write(STDOUT_FILENO, *input_uncompressed, i);
         printf("Size: %" PRIu64 "\n", i);
     }
 
