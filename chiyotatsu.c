@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include "own_utils/args.h"
-#include "own_utils/chiyotatsu_protobufs.h"
+#include "own_utils/tachiyomi.pb-c.h"
 #include "own_utils/tachiyomi_gzip.h"
 #include "own_utils/tachiyomi_parse.h"
 
@@ -19,8 +19,7 @@ int main(int argc, char **argv)
         __bread_calloc(1, sizeof(unsigned char *));
     unsigned char **output_compressed =
         __bread_calloc(1, sizeof(unsigned char *));
-
-    T_Book_List tachiyomi_books[1] = {0};
+    BackupManga *tachiyomi_books = NULL;
 
     define_args();
     bread_parse(argc, argv);
@@ -32,8 +31,15 @@ int main(int argc, char **argv)
         uint64_t i = tachiyomi_gzip_load(file_input, input_uncompressed) *
                      sizeof(unsigned char);
         printf("Decompressed size: %" PRIu64 "\n", i);
+        tachiyomi_books = deserialize_protobuf(*input_uncompressed, i);
+        if (tachiyomi_books == NULL)
+        {
+            __bread_panic("Failed to serialize tachiyomi_books\n");
+        }
 
-        tachiyomi_data_parse(*input_uncompressed, tachiyomi_books, i);
+        printf("%s\n", tachiyomi_books->title);
+
+        backup_manga__free_unpacked(tachiyomi_books, NULL);
     }
 
     if (bread_parser_is_opt_used('o'))

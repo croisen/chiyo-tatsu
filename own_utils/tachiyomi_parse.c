@@ -1,45 +1,28 @@
-#include <inttypes.h>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <protobuf-c/protobuf-c.h>
 
 #include "bread_parser.h"
-#include "chiyotatsu_protobufs.h"
+#include "tachiyomi.pb-c.h"
 #include "tachiyomi_parse.h"
 
-void tachiyomi_data_parse(unsigned char *input_data, T_Book_List *books,
-                          uint64_t len)
+void *__modified_bread_malloc(void *ctx, uint64_t size)
 {
-    (void)books;
-    int64_t iters = 0;
-    for (uint64_t i = 0; i < len; i += 1)
-    {
-        uint64_t book_len = 0;
-        if (input_data[i] == 0x0A)
-        {
-            VarInt_Ret length = decode_var_int(&input_data[i + 1], len);
-            book_len          = (&length)->decoded;
-
-            uint64_t id =
-                bytes_to_uint64(&input_data[i + (&length)->byte_count]);
-            uint64_t rev = reverse_bytes(id);
-            printf("Index: %" PRIu64 " Length: %" PRIu64 " ID: %" PRIu64
-                   " Reversed: %" PRIu64 "\n",
-                   i, book_len, id, rev);
-        }
-
-        i     += book_len;
-        iters += 1;
-
-        if (iters > 100)
-        {
-            break;
-        }
-    }
+    (void)ctx;
+    return __bread_malloc(size);
 }
 
-void tachiyomi_books_print(T_Book_List *books)
+void __modified_bread_free(void *ctx, void *ptr)
 {
-    (void)books;
+    (void)ctx;
+    __bread_free(ptr);
+}
+
+ProtobufCAllocator __bread_alloc = {
+    .alloc          = __modified_bread_malloc,
+    .free           = __modified_bread_free,
+    .allocator_data = NULL,
+};
+
+BackupManga *deserialize_protobuf(uint8_t *input_uncompressed, uint64_t size)
+{
+    return backup_manga__unpack(&__bread_alloc, size, input_uncompressed);
 }
