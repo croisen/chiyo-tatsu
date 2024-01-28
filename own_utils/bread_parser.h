@@ -1,5 +1,4 @@
-// O hail no
-
+// O hail no #pragmas
 #if defined __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
@@ -11,7 +10,6 @@
 #ifndef CROI_LIB_BREAD_PARSER_H
 #define CROI_LIB_BREAD_PARSER_H
 
-#include <assert.h>
 #include <inttypes.h>
 #include <math.h>
 
@@ -35,8 +33,8 @@ struct __arg
 {
     bool used;
 
-    size_t arg_count;
-    size_t group_num;
+    uint64_t arg_count;
+    uint64_t group_num;
 
     char short_opt;
     char *long_opt;
@@ -49,8 +47,8 @@ struct __arg
 struct __darr_for_ptr
 {
     bool init;
-    size_t size;
-    size_t used;
+    uint64_t size;
+    uint64_t used;
     void **ptrs;
 };
 
@@ -68,17 +66,17 @@ extern void bread_parse(int argc, char **argv);
 
 extern bool bread_parser_is_opt_used(char short_opt);
 extern void **bread_parser_get_all_args(char short_opt);
-extern void *bread_parser_get_arg(char short_opt, size_t index);
+extern void *bread_parser_get_arg(char short_opt, uint64_t index);
 
 extern void bread_parser_add_option(char short_opt, char *long_opt,
-                                    size_t group);
+                                    uint64_t group);
 extern void bread_parser_add_descrp(char short_opt, char *description);
-extern void bread_parser_opt_argmts(char short_opt, size_t arg_count, ...);
+extern void bread_parser_opt_argmts(char short_opt, uint64_t arg_count, ...);
 
 extern void __bread_free(void *ptr);
-extern void *__bread_calloc(size_t nmemb, size_t size);
-extern void *__bread_malloc(size_t size);
-extern void *__bread_realloc(void *ptr, size_t size);
+extern void *__bread_calloc(uint64_t nmemb, uint64_t size);
+extern void *__bread_malloc(uint64_t size);
+extern void *__bread_realloc(void *ptr, uint64_t size);
 
 #define __bread_panic(message, ...)          \
     fprintf(stderr, message, ##__VA_ARGS__); \
@@ -95,7 +93,7 @@ char *program_name = NULL;
 DA some_args       = {0};
 DA alloced_ptrs    = {0};
 
-extern int __memtracker_bs(void *ptr, size_t start, size_t end);
+extern int __memtracker_bs(void *ptr, uint64_t start, uint64_t end);
 extern int __memtracker_sort(const void *a, const void *b);
 extern void __memtracker_init(void);
 extern void __memtracker_free_void(void);
@@ -133,14 +131,14 @@ int __memtracker_sort(const void *a, const void *b)
     void *d = *(void **)b;
 
     // Sorted from highest to lowest
-    return (size_t)d - (size_t)c;
+    return (uint64_t)d - (uint64_t)c;
 }
 
-int __memtracker_bs(void *ptr, size_t start, size_t end)
+int __memtracker_bs(void *ptr, uint64_t start, uint64_t end)
 {
-    size_t val1 = (size_t)ptr;
-    size_t half = (start + (end - 1)) / 2;
-    size_t val2 = (size_t)alloced_ptrs->ptrs[half];
+    uint64_t val1 = (uint64_t)ptr;
+    uint64_t half = (start + (end - 1)) / 2;
+    uint64_t val2 = (uint64_t)alloced_ptrs->ptrs[half];
 
     if (end >= 1)
     {
@@ -182,7 +180,7 @@ void __memtracker_init(void)
 
 void __memtracker_free_void(void)
 {
-    for (size_t i = 0; i < alloced_ptrs->used; i += 1)
+    for (uint64_t i = 0; i < alloced_ptrs->used; i += 1)
     {
         free(alloced_ptrs->ptrs[i]);
     }
@@ -229,7 +227,7 @@ void bread_parser_set_author_email(const char *email)
     strcpy(author_email, email);
 }
 
-void *__bread_calloc(size_t nmemb, size_t size)
+void *__bread_calloc(uint64_t nmemb, uint64_t size)
 {
     if (!alloced_ptrs->init)
     {
@@ -248,8 +246,8 @@ void *__bread_calloc(size_t nmemb, size_t size)
                           "realloc return NULL\n");
         }
 
-        for (size_t i  = (alloced_ptrs->size - 1); i < (alloced_ptrs->size * 2);
-             i        += 1)
+        for (uint64_t i                       = (alloced_ptrs->size - 1);
+             i < (alloced_ptrs->size * 2); i += 1)
         {
             new_arr[i] = NULL;
         }
@@ -267,7 +265,7 @@ void *__bread_calloc(size_t nmemb, size_t size)
     return res;
 }
 
-void *__bread_malloc(size_t size)
+void *__bread_malloc(uint64_t size)
 {
     if (!alloced_ptrs->init)
     {
@@ -286,8 +284,8 @@ void *__bread_malloc(size_t size)
                           "realloc return NULL\n");
         }
 
-        for (size_t i  = (alloced_ptrs->size - 1); i < (alloced_ptrs->size * 2);
-             i        += 1)
+        for (uint64_t i                       = (alloced_ptrs->size - 1);
+             i < (alloced_ptrs->size * 2); i += 1)
         {
             new_arr[i] = NULL;
         }
@@ -305,7 +303,7 @@ void *__bread_malloc(size_t size)
     return res;
 }
 
-void *__bread_realloc(void *ptr, size_t size)
+void *__bread_realloc(void *ptr, uint64_t size)
 {
     if (!alloced_ptrs->init)
     {
@@ -324,8 +322,8 @@ void *__bread_realloc(void *ptr, size_t size)
                           "realloc return NULL\n");
         }
 
-        for (size_t i  = (alloced_ptrs->size - 1); i < (alloced_ptrs->size * 2);
-             i        += 1)
+        for (uint64_t i                       = (alloced_ptrs->size - 1);
+             i < (alloced_ptrs->size * 2); i += 1)
         {
             new_arr[i] = NULL;
         }
@@ -334,7 +332,7 @@ void *__bread_realloc(void *ptr, size_t size)
         alloced_ptrs->size *= 2;
     }
 
-    for (size_t i = 0; i < alloced_ptrs->used; i += 1)
+    for (uint64_t i = 0; i < alloced_ptrs->used; i += 1)
     {
         if (res != NULL && alloced_ptrs->ptrs[i] == ptr)
         {
@@ -371,24 +369,24 @@ void bread_print_args(void)
     qsort((ArgPtr *)some_args->ptrs, some_args->used, sizeof(ArgPtr),
           __bread_args_compare);
 
-    size_t opt_len = 0;
-    for (size_t i = 0; i < some_args->used; i++)
+    uint64_t opt_len = 0;
+    for (uint64_t i = 0; i < some_args->used; i++)
     {
         ArgPtr x = ((ArgPtr)some_args->ptrs[i]);
         if (x->long_opt != NULL)
         {
-            size_t y = strlen(x->long_opt);
-            opt_len  = (y > opt_len) ? y : opt_len;
+            uint64_t y = strlen(x->long_opt);
+            opt_len    = (y > opt_len) ? y : opt_len;
         }
     }
 
-    for (size_t i = 0; i < some_args->used; i++)
+    for (uint64_t i = 0; i < some_args->used; i++)
     {
         ArgPtr x = ((ArgPtr)some_args->ptrs[i]);
         printf("\t-%c \t --%s", x->short_opt, x->long_opt);
         if (x->long_opt != NULL)
         {
-            for (size_t ii = 0; ii < (opt_len - strlen(x->long_opt)); ii += 1)
+            for (uint64_t ii = 0; ii < (opt_len - strlen(x->long_opt)); ii += 1)
             {
                 printf(" ");
             }
@@ -399,8 +397,8 @@ void bread_print_args(void)
             if (x->descr != NULL)
             {
                 printf("\t %s\n", x->descr);
-                for (size_t ii  = 0; ii < (opt_len - strlen(x->long_opt));
-                     ii        += 1)
+                for (uint64_t ii  = 0; ii < (opt_len - strlen(x->long_opt));
+                     ii          += 1)
                 {
                     printf(" ");
                 }
@@ -412,7 +410,7 @@ void bread_print_args(void)
                 printf("={ ");
             }
 
-            for (size_t iii = 0; iii < x->arg_count; iii += 1)
+            for (uint64_t iii = 0; iii < x->arg_count; iii += 1)
             {
                 enum __arg_type z = x->arg_type_list[iii];
                 switch (z)
@@ -450,7 +448,7 @@ void bread_print_args(void)
     }
 }
 
-void bread_parser_add_option(char short_opt, char *long_opt, size_t group)
+void bread_parser_add_option(char short_opt, char *long_opt, uint64_t group)
 {
     if (!some_args->init)
     {
@@ -466,7 +464,7 @@ void bread_parser_add_option(char short_opt, char *long_opt, size_t group)
         }
     }
 
-    for (size_t i = 0; i < some_args->used; i += 1)
+    for (uint64_t i = 0; i < some_args->used; i += 1)
     {
         if (short_opt == ((ArgPtr)some_args->ptrs[i])->short_opt)
         {
@@ -485,8 +483,8 @@ void bread_parser_add_option(char short_opt, char *long_opt, size_t group)
                           "realloc return NULL\n");
         }
 
-        for (size_t i  = (some_args->size - 1); i < (some_args->size * 2);
-             i        += 1)
+        for (uint64_t i  = (some_args->size - 1); i < (some_args->size * 2);
+             i          += 1)
         {
             new_arr[i] = NULL;
         }
@@ -549,7 +547,7 @@ void bread_parser_add_descrp(char short_opt, char *description)
         }
     }
 
-    for (size_t i = 0; i < some_args->used; i += 1)
+    for (uint64_t i = 0; i < some_args->used; i += 1)
     {
         ArgPtr x = (ArgPtr)some_args->ptrs[i];
         if (short_opt == x->short_opt && x->descr == NULL)
@@ -574,7 +572,9 @@ void bread_parser_add_descrp(char short_opt, char *description)
     fprintf(stderr, "Argument short opt -%c not found\n", short_opt);
 }
 
-void bread_parser_opt_argmts(char short_opt, size_t arg_count, ...)
+// Adds arguments to opt, arg types is denoted by BREAD_U64, BREAD_I64,
+// and BREAD_CHAR
+void bread_parser_opt_argmts(char short_opt, uint64_t arg_count, ...)
 {
     if (!some_args->init)
     {
@@ -591,7 +591,7 @@ void bread_parser_opt_argmts(char short_opt, size_t arg_count, ...)
     }
 
     ArgPtr x = NULL;
-    for (size_t i = 0; i < some_args->used; i += 1)
+    for (uint64_t i = 0; i < some_args->used; i += 1)
     {
         if (short_opt == ((ArgPtr)some_args->ptrs[i])->short_opt)
         {
@@ -616,7 +616,7 @@ void bread_parser_opt_argmts(char short_opt, size_t arg_count, ...)
                       short_opt);
     }
 
-    for (size_t i = 0; i < arg_count; i += 1)
+    for (uint64_t i = 0; i < arg_count; i += 1)
     {
         x->arg_type_list[i] = va_arg(args, enum __arg_type);
     }
@@ -624,6 +624,8 @@ void bread_parser_opt_argmts(char short_opt, size_t arg_count, ...)
     va_end(args);
 }
 
+// Prints the information about an argument via it's argptr
+// internal function only
 void __bread_print_some_arg(ArgPtr x)
 {
     if (x == NULL)
@@ -633,7 +635,7 @@ void __bread_print_some_arg(ArgPtr x)
 
     printf("\t-%c \t --%s={ ", x->short_opt, x->long_opt);
 
-    for (size_t i = 0; i < x->arg_count; i += 1)
+    for (uint64_t i = 0; i < x->arg_count; i += 1)
     {
         enum __arg_type z = x->arg_type_list[i];
         switch (z)
@@ -665,9 +667,14 @@ void __bread_print_some_arg(ArgPtr x)
     }
 }
 
-size_t __bread_parse_opt_args(ArgPtr x, size_t offset, size_t argc, char **argv)
+// Parses the arguments after --opt or -o when using bread_parse
+// and initializes the necessary struct **fields** with said args
+// though the whole program would exit if the input doesn't match
+// the signature made with bread_parser_opt_argmts (Also an internal function)
+uint64_t __bread_parse_opt_args(ArgPtr x, uint64_t offset, uint64_t argc,
+                                char **argv)
 {
-    size_t args_parsed = 0;
+    uint64_t args_parsed = 0;
     if (x == NULL)
     {
         __bread_panic("Unknown argument %s was passed\n", argv[offset]);
@@ -688,13 +695,15 @@ size_t __bread_parse_opt_args(ArgPtr x, size_t offset, size_t argc, char **argv)
                       argv[offset]);
     }
 
-    for (size_t i = 1; i <= x->arg_count; i += 1)
+    for (uint64_t i = 1; i <= x->arg_count; i += 1)
     {
         if ((i + offset) >= argc)
         {
             break;
         }
 
+        // Parse args after the --opt or -o, and if it doesn't match
+        // the signature(?) made by bread_parser_opt_argmts, exit immediately
         switch (x->arg_type_list[i - 1])
         {
         case BREAD_I64:
@@ -781,6 +790,9 @@ size_t __bread_parse_opt_args(ArgPtr x, size_t offset, size_t argc, char **argv)
     return args_parsed;
 }
 
+// Prints all the arguments made with bread_parser_add_option
+// Though the help option would not exist yet as that is only
+// finalized after using bread_parse
 void bread_print_help(int exit_code, char **argv)
 {
     printf("Program name: %s\n",
@@ -799,6 +811,9 @@ void bread_print_help(int exit_code, char **argv)
     exit(exit_code);
 }
 
+// The one that mainly parses the arguments passed into an application
+// (not really), and it adds the -h option to the whole app
+// (**should be called only once**)
 void bread_parse(int argc, char **argv)
 {
     bread_parser_add_option('h', "help", 0);
@@ -812,48 +827,52 @@ void bread_parse(int argc, char **argv)
 
     for (int i = 1; i < argc; i += 1)
     {
-        ArgPtr x           = NULL;
-        size_t args_parsed = 0;
-        if (argv[i][0] == '-')
+        ArgPtr x             = NULL;
+        uint64_t args_parsed = 0;
+        if (argv[i][0] != '-')
         {
-            if (argv[i][1] == '-')
-            {
-                for (size_t ii = 0; ii < some_args->used; ii += 1)
-                {
-                    if (strcmp(((ArgPtr)some_args->ptrs[ii])->long_opt,
-                               &argv[i][2]) == 0)
-                    {
-                        x = (ArgPtr)some_args->ptrs[ii];
-                    }
-                }
-
-                if (x->used == true)
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                for (size_t ii = 0; ii < some_args->used; ii += 1)
-                {
-                    if (((ArgPtr)some_args->ptrs[ii])->short_opt == argv[i][1])
-                    {
-                        x = (ArgPtr)some_args->ptrs[ii];
-                    }
-                }
-            }
-
-            args_parsed = __bread_parse_opt_args(x, i, argc, argv);
+            continue;
         }
 
-        i += args_parsed;
+        if (argv[i][1] == '-')
+        {
+            for (uint64_t ii = 0; ii < some_args->used; ii += 1)
+            {
+                if (strcmp(((ArgPtr)some_args->ptrs[ii])->long_opt,
+                           &argv[i][2]) == 0)
+                {
+                    x = (ArgPtr)some_args->ptrs[ii];
+                }
+            }
+        }
+        else
+        {
+            for (uint64_t ii = 0; ii < some_args->used; ii += 1)
+            {
+                if (((ArgPtr)some_args->ptrs[ii])->short_opt == argv[i][1])
+                {
+                    x = (ArgPtr)some_args->ptrs[ii];
+                }
+            }
+        }
+
+        if (x->used == true)
+        {
+            continue;
+        }
+
+        args_parsed  = __bread_parse_opt_args(x, i, argc, argv);
+        i           += args_parsed;
     }
 }
 
+// Returns true if the opt was used after bread_parse
+// (the first safe guard against null ptr dereferencing on opts and args that
+// wasn't passed)
 bool bread_parser_is_opt_used(char short_opt)
 {
     ArgPtr x = NULL;
-    for (size_t i = 0; i < some_args->used; i += 1)
+    for (uint64_t i = 0; i < some_args->used; i += 1)
     {
         if (short_opt == ((ArgPtr)some_args->ptrs[i])->short_opt)
         {
@@ -870,10 +889,13 @@ bool bread_parser_is_opt_used(char short_opt)
     return x->used;
 }
 
+// Returns a list of ptrs to the args of an opt after bread_parse
+// returns null if opt has an arg count of zero
+// (a.k.a. bread_parser_opt_argmts was not used on this opt)
 void **bread_parser_get_all_args(char short_opt)
 {
     ArgPtr x = NULL;
-    for (size_t i = 0; i < some_args->used; i += 1)
+    for (uint64_t i = 0; i < some_args->used; i += 1)
     {
         if (short_opt == ((ArgPtr)some_args->ptrs[i])->short_opt)
         {
@@ -890,10 +912,13 @@ void **bread_parser_get_all_args(char short_opt)
     return x->args;
 }
 
-void *bread_parser_get_arg(char short_opt, size_t index)
+// Used after bread_parse, returns a pointer to a specific argument in an opt
+// and indexing starts at 0, and this function would fail if you use
+// it on an opt that has an arg count of 0
+void *bread_parser_get_arg(char short_opt, uint64_t index)
 {
     ArgPtr x = NULL;
-    for (size_t i = 0; i < some_args->used; i += 1)
+    for (uint64_t i = 0; i < some_args->used; i += 1)
     {
         if (short_opt == ((ArgPtr)some_args->ptrs[i])->short_opt)
         {

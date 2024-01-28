@@ -4,7 +4,9 @@
 #include <unistd.h>
 
 #include "own_utils/args.h"
+#include "own_utils/chiyotatsu_protobufs.h"
 #include "own_utils/tachiyomi_gzip.h"
+#include "own_utils/tachiyomi_parse.h"
 
 #define CROI_LIB_BREAD_PARSER_IMPL_H
 #include "own_utils/bread_parser.h"
@@ -18,6 +20,8 @@ int main(int argc, char **argv)
     unsigned char **output_compressed =
         __bread_calloc(1, sizeof(unsigned char *));
 
+    T_Book_List tachiyomi_books[1] = {0};
+
     define_args();
     bread_parse(argc, argv);
 
@@ -25,10 +29,11 @@ int main(int argc, char **argv)
     {
         char *file_input = bread_parser_get_arg('i', 0);
         printf("Trying to decompress %s\n", file_input);
-        size_t i = tachiyomi_gzip_load(file_input, input_uncompressed) *
-                   sizeof(unsigned char);
-        write(STDOUT_FILENO, *input_uncompressed, i);
-        printf("Size: %" PRIu64 "\n", i);
+        uint64_t i = tachiyomi_gzip_load(file_input, input_uncompressed) *
+                     sizeof(unsigned char);
+        printf("Decompressed size: %" PRIu64 "\n", i);
+
+        tachiyomi_data_parse(*input_uncompressed, tachiyomi_books, i);
     }
 
     if (bread_parser_is_opt_used('o'))
