@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include <string.h>
@@ -8,11 +9,10 @@
 #include "bread_parser.h"
 #include "tachiyomi_gzip.h"
 
-#define CHUNK      524288
+#define CHUNK      131072
 #define WINDOWBITS 16
 
-uint64_t tachiyomi_gzip_load(const char *filename,
-                             unsigned char **input_uncompressed)
+uint64_t tachiyomi_gzip_load(const char *filename, uint8_t **buffer_out)
 {
     FILE *tachiyomi_bk = fopen(filename, "rb");
     if (tachiyomi_bk == NULL)
@@ -20,12 +20,11 @@ uint64_t tachiyomi_gzip_load(const char *filename,
         __bread_panic("Cannot open tachiyomi backup %s\n", filename);
     }
 
-    int64_t ret   = 0;
-    uint64_t have = 0;
-
-    z_stream strm = {0};
-    unsigned char in[CHUNK];
-    unsigned char out[CHUNK];
+    int64_t ret        = 0;
+    uint64_t have      = 0;
+    uint8_t in[CHUNK]  = {0};
+    uint8_t out[CHUNK] = {0};
+    z_stream strm      = {0};
 
     if (inflateInit2(&strm, WINDOWBITS + MAX_WBITS) != Z_OK)
     {
@@ -73,9 +72,8 @@ uint64_t tachiyomi_gzip_load(const char *filename,
                 __bread_panic("Error in decompressing file %s\n", filename);
             }
 
-            have                    = CHUNK - strm.avail_out;
-            unsigned char *new_size = __bread_realloc(
-                *input_uncompressed, strm.total_out * sizeof(unsigned char));
+            have              = CHUNK - strm.avail_out;
+            uint8_t *new_size = __bread_realloc(*buffer_out, strm.total_out);
             if (new_size == NULL)
             {
                 (void)inflateEnd(&strm);
@@ -83,8 +81,8 @@ uint64_t tachiyomi_gzip_load(const char *filename,
                 __bread_panic("Error in decompressing file %s\n", filename);
             }
 
-            *input_uncompressed = new_size;
-            memcpy(*input_uncompressed + strm.total_out - have, out, have);
+            *buffer_out = new_size;
+            memcpy(*buffer_out + strm.total_out - have, out, have);
         } while (strm.avail_out == 0);
     } while (ret != Z_STREAM_END);
 
