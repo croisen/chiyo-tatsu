@@ -1,7 +1,7 @@
 CC				= cc
 CFLAGS			= -Wall -Wextra -Wpedantic -Werror
 NOWARN			= -Wno-implicit-fallthrough
-OPTS_DEBUG		= -Og -g
+OPTS_DEBUG		= -Og -g -D'__BCROI_PARSER_DEBUG' -D'__CCROI_CHIYO_TATSU_DEBUG'
 OPTS_RELEASE	= -O3 -s --static
 LIBS			= -lz -lprotobuf
 LIBS_DIR		= -L./built_libs -I./other_includes

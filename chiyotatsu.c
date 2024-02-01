@@ -36,12 +36,8 @@ int main(int argc, char **argv)
     printf("Trying to decompress %s\n", file_input);
     uint64_t i = tachiyomi_gzip_load(file_input, &input_buf);
 
-    for (uint64_t ii = 0; ii < i; ii += 1)
-    {
-        putchar(input_buf[ii]);
-    }
+    printf("Decompressed size: %" PRIu64 "\n", i);
     decode_unknown_protobuf(input_buf, i, NULL);
-    printf("\nDecompressed size: %" PRIu64 "\n", i);
 
     return 0;
 }
