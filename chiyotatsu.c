@@ -29,15 +29,16 @@ int main(int argc, char **argv)
         __bread_panic("Output not implemented yet\n");
     }
 
-    uint8_t *input_buf = NULL;
+    uint8_t *input_buf          = NULL;
+    PB_ProtoBuf_Struct *out_buf = NULL;
     /*uint8_t **output_buf = __bread_calloc(1, sizeof(uint8_t *));*/
 
-    char *file_input   = bread_parser_get_arg('i', 0);
+    char *file_input            = bread_parser_get_arg('i', 0);
     printf("Trying to decompress %s\n", file_input);
     uint64_t i = tachiyomi_gzip_load(file_input, &input_buf);
 
     printf("Decompressed size: %" PRIu64 "\n", i);
-    decode_unknown_protobuf(input_buf, i, NULL);
+    decode_unknown_protobuf(input_buf, i, &out_buf);
 
     return 0;
 }

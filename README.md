@@ -15,7 +15,29 @@ A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 -   [ ] Struggle converting between the two
 -   [ ] Struggle in writing the zip file backup of kotatsu
 
+## Manual Installation (It's very incomplete though)
+
+Try to have all the dependencies installed and run the following
+
+```bash
+git clone "https://github.com/croisen/chiyo-tatsu.git"
+cd chiyo-tatsu/
+make
+```
+
 ## External Libraries Used
 
 -   [protobuf-c](https://github.com/protobuf-c/protobuf-c)
 -   [zlib](https://github.com/madler/zlib)
+
+## Dependencies of said External Libraries
+
+-   automake
+-   autoconf
+-   binutils
+-   cmake
+-   make
+-   protoc
+
+-   libtool
+-   libprotobuf

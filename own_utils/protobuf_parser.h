@@ -15,7 +15,19 @@ enum __wire_types
     PB_32 = 5,
 };
 
+struct __some_pb
+{
+    char *message_name;
+    uint64_t field_number;
+    enum __wire_types wire_type;
+    void *message;
+    struct __some_pb *repeated_pb;
+};
+
+typedef enum __wire_types PB_Wire_types;
+typedef struct __some_pb PB_ProtoBuf_Struct;
+
 void decode_unknown_protobuf(uint8_t *bytes, uint64_t bytes_size,
-                             uint8_t **out_buffer);
+                             PB_ProtoBuf_Struct **out_buffer);
 
 #endif

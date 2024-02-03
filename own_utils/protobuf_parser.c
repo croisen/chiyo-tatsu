@@ -86,13 +86,13 @@ uint64_t __decode_varint(uint8_t *start, uint64_t *out_buffer)
 }
 
 void decode_unknown_protobuf(uint8_t *bytes, uint64_t bytes_size,
-                             uint8_t **out_buffer)
+                             PB_ProtoBuf_Struct **out_buffer)
 {
     (void)out_buffer;
 
     for (uint64_t i = 0; i < bytes_size; i += 1)
     {
-        enum __wire_types wt = bytes[i] & PB_WIRE_MASK;
+        PB_Wire_types wt     = bytes[i] & PB_WIRE_MASK;
         bool ln_flag         = false;
         uint64_t v_i         = 0;
         uint64_t u64         = 0;

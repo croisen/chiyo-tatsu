@@ -3,7 +3,8 @@ CFLAGS			= -Wall -Wextra -Wpedantic -Werror
 NOWARN			= -Wno-implicit-fallthrough
 OPTS_DEBUG		= -Og -g -D'__BCROI_PARSER_DEBUG' -D'__CCROI_CHIYO_TATSU_DEBUG'
 OPTS_RELEASE	= -O3 -s --static
-LIBS			= -lz -lprotobuf
+LIBS			= -lz
+#LIBS			= -lz -lprotobuf-c
 LIBS_DIR		= -L./built_libs -I./other_includes
 
 EXE				= chiyotatsu.exe
@@ -12,10 +13,11 @@ MAIN			= chiyotatsu.c
 COMPONENTS_C	= ${wildcard own_utils/*.c}
 COMPONENTS_O	= ${patsubst %.c,%.o,${COMPONENTS_C}}
 
-OTHER_LIBS		= built_libs/libz.a built_libs/libprotobuf.a
+OTHER_LIBS		= built_libs/libz.a
+#OTHER_LIBS		= built_libs/libz.a built_libs/libprotobuf-c.a
 
 VALGRIND		:= ${shell command -v valgrind 2>/dev/null}
-VALGRIND_OPTS	= --leak-check=full --show-leak-kinds=all --track-origins=yes
+VALGRIND_OPTS	= --leak-check=full --show-leak-kinds=all --track-origins=yes -s
 
 
 .PHONY: all clean test debug other_libs
@@ -49,8 +51,8 @@ protobuf-c:
 	mkdir -p other_includes/
 	cd other_libs/$@; ./autogen.sh && ./configure
 	$(MAKE) -C other_libs/$@
-	cp other_libs/$@/$@/.libs/lib$@.a  built_libs/libprotobuf.a
-	cp other_libs/$@/$@/.libs/lib$@.so built_libs/libprotobuf.so
+	cp other_libs/$@/$@/.libs/lib$@.a  built_libs/
+	cp other_libs/$@/$@/.libs/lib$@.so built_libs/
 	cp other_libs/$@/$@/$@.h           other_includes/
 
 zlib:
@@ -75,4 +77,4 @@ else
 endif
 
 built_libs/libz.a: zlib
-built_libs/libprotobuf.a: protobuf-c
+built_libs/libprotobuf-c.a: protobuf-c
