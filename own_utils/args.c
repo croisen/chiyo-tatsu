@@ -3,7 +3,7 @@
 
 void define_args(void)
 {
-    bread_parser_set_program_name("Chiyo->Tatsu");
+    bread_parser_set_program_name("Chiyo-Tatsu");
     bread_parser_set_author_name("Croisen");
     bread_parser_set_author_email("andrewjames.git.gan@gmail.com");
 

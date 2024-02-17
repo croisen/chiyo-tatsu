@@ -1,7 +1,7 @@
 CC				= cc
 CFLAGS			= -Wall -Wextra -Wpedantic -Werror
 NOWARN			= -Wno-implicit-fallthrough
-OPTS_DEBUG		= -Og -g -D'__BCROI_PARSER_DEBUG' -D'__CCROI_CHIYO_TATSU_DEBUG'
+OPTS_DEBUG		= -Og -g -D'___BREAD_PARSER_DEBUG' -D'___CHIYO_TATSU_DEBUG' -D'___MEMTRACKER_DEBUG'
 OPTS_RELEASE	= -O3 -s --static
 LIBS			= -lz
 #LIBS			= -lz -lprotobuf-c
@@ -34,7 +34,8 @@ other_libs:
 	}
 
 debug: clean ${COMPONENTS_O} other_libs
-	${CC} ${CFLAGS} ${NOWARN} ${OPTS_DEBUG} -o ${EXE} ${MAIN}\
+	${CC} ${CFLAGS} ${NOWARN} ${OPTS_DEBUG}\
+		-o ${EXE} ${MAIN}\
 		${COMPONENTS_O}\
 		${LIBS} ${LIBS_DIR}
 

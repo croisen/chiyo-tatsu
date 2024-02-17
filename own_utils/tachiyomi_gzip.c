@@ -6,7 +6,7 @@
 #include <zconf.h>
 #include <zlib.h>
 
-#include "bread_parser.h"
+#include "memtracker.h"
 #include "tachiyomi_gzip.h"
 
 #define CHUNK      131072
@@ -17,7 +17,7 @@ uint64_t tachiyomi_gzip_load(const char *filename, uint8_t **buffer_out)
     FILE *tachiyomi_bk = fopen(filename, "rb");
     if (tachiyomi_bk == NULL)
     {
-        __bread_panic("Cannot open tachiyomi backup %s\n", filename);
+        memtracker_panic("Cannot open tachiyomi backup %s\n", filename);
     }
 
     int64_t ret        = 0;
@@ -28,8 +28,8 @@ uint64_t tachiyomi_gzip_load(const char *filename, uint8_t **buffer_out)
 
     if (inflateInit2(&strm, WINDOWBITS + MAX_WBITS) != Z_OK)
     {
-        __bread_panic("Cannot decompress the tachiyomi input file %s\n",
-                      filename);
+        memtracker_panic("Cannot decompress the tachiyomi input file %s\n",
+                         filename);
     }
 
     do
@@ -39,7 +39,7 @@ uint64_t tachiyomi_gzip_load(const char *filename, uint8_t **buffer_out)
         {
             (void)inflateEnd(&strm);
             fclose(tachiyomi_bk);
-            __bread_panic("Error in decompressing file %s\n", filename);
+            memtracker_panic("Error in decompressing file %s\n", filename);
         }
 
         if (strm.avail_in == 0)
@@ -58,7 +58,7 @@ uint64_t tachiyomi_gzip_load(const char *filename, uint8_t **buffer_out)
             {
                 (void)inflateEnd(&strm);
                 fclose(tachiyomi_bk);
-                __bread_panic("Error in decompressing file %s\n", filename);
+                memtracker_panic("Error in decompressing file %s\n", filename);
             }
 
             switch (ret)
@@ -69,16 +69,16 @@ uint64_t tachiyomi_gzip_load(const char *filename, uint8_t **buffer_out)
             case Z_MEM_ERROR:
                 (void)inflateEnd(&strm);
                 fclose(tachiyomi_bk);
-                __bread_panic("Error in decompressing file %s\n", filename);
+                memtracker_panic("Error in decompressing file %s\n", filename);
             }
 
             have              = CHUNK - strm.avail_out;
-            uint8_t *new_size = __bread_realloc(*buffer_out, strm.total_out);
+            uint8_t *new_size = croi_realloc(*buffer_out, strm.total_out);
             if (new_size == NULL)
             {
                 (void)inflateEnd(&strm);
                 fclose(tachiyomi_bk);
-                __bread_panic("Error in decompressing file %s\n", filename);
+                memtracker_panic("Error in decompressing file %s\n", filename);
             }
 
             *buffer_out = new_size;

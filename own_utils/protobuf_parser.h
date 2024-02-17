@@ -3,7 +3,10 @@
 
 #include <stdint.h>
 
-#define PB_WIRE_MASK 7
+#define BYTE_U32_SIZE 4
+#define BYTE_U64_SIZE 8
+
+#define PB_WIRE_MASK  7
 
 enum __wire_types
 {

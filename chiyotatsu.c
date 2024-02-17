@@ -8,9 +8,9 @@
 #include "own_utils/tachiyomi_gzip.h"
 
 #define CROI_LIB_BREAD_PARSER_IMPL_H
+#define CROI_LIB_0001_MEMTRACKER_IMPL_H
 #include "own_utils/bread_parser.h"
-
-static volatile int run = 1;
+#include "own_utils/memtracker.h"
 
 int main(int argc, char **argv)
 {
