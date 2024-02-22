@@ -1,4 +1,5 @@
 CC				= cc
+MINGWCC			= x86_64-w64-mingw32-gcc
 CFLAGS			= -Wall -Wextra -Wpedantic -Werror
 NOWARN			= -Wno-implicit-fallthrough
 OPTS_DEBUG		= -Og -g -D'___BREAD_PARSER_DEBUG' -D'___CHIYO_TATSU_DEBUG' -D'___MEMTRACKER_DEBUG'
@@ -8,6 +9,7 @@ LIBS			= -lz
 LIBS_DIR		= -L./built_libs -I./other_includes
 
 EXE				= chiyotatsu.exe
+ELF				= chiyotatsu.elf
 MAIN			= chiyotatsu.c
 
 COMPONENTS_C	= ${wildcard own_utils/*.c}
@@ -16,37 +18,28 @@ COMPONENTS_O	= ${patsubst %.c,%.o,${COMPONENTS_C}}
 OTHER_LIBS		= built_libs/libz.a
 #OTHER_LIBS		= built_libs/libz.a built_libs/libprotobuf-c.a
 
-VALGRIND		:= ${shell command -v valgrind 2>/dev/null}
-VALGRIND_OPTS	= --leak-check=full --show-leak-kinds=all --track-origins=yes -s
-
-
-.PHONY: all clean test debug other_libs
-all: clean ${EXE}
-
-define rebuild_other_libs
-test -e ${1} || ${MAKE} ${1}
-
-endef
-
-other_libs:
-	${foreach lib,${OTHER_LIBS},\
-		${call rebuild_other_libs,${lib}}\
-	}
-
-debug: clean ${COMPONENTS_O} other_libs
+debug: clean ${patsubst %,%_DEBUG,${COMPONENTS_O}} ${OTHER_LIBS}
 	${CC} ${CFLAGS} ${NOWARN} ${OPTS_DEBUG}\
 		-o ${EXE} ${MAIN}\
 		${COMPONENTS_O}\
 		${LIBS} ${LIBS_DIR}
 
-${EXE}: clean ${COMPONENTS_O} other_libs
+${ELF}: ${COMPONENTS_O} ${OTHER_LIBS}
 	${CC} ${CFLAGS} ${NOWARN} ${OPTS_RELEASE} -o $@ ${MAIN}\
 		${COMPONENTS_O}\
 		${LIBS} ${LIBS_DIR}
-		
+
+${EXE}: ${COMPONENTS_O} ${OTHER_LIBS}
+	${MINGWCC} ${CFLAGS} ${NOWARN} ${OPTS_RELEASE} -o $@ ${MAIN}\
+		${COMPONENTS_O}\
+		${LIBS} ${LIBS_DIR}
 
 ${COMPONENTS_O}:
 	${CC} ${CFLAGS} ${OPTS} -o $@ -c ${patsubst %.o,%.c,$@} ${NOWARN}
+
+${patsubst %,%_DEBUG,${COMPONENTS_O}}:
+	${CC} ${CFLAGS} ${OPTS_DEBUG} -o ${patsubst %_DEBUG,%,$@}\
+		-c ${patsubst %.o_DEBUG,%.c,$@} ${NOWARN}
 
 protobuf-c:
 	mkdir -p other_includes/
@@ -68,14 +61,15 @@ zlib:
 
 clean:
 	rm -f ${EXE}
+	rm -f ${ELF}
+	rm -f ${OTHER_LIBS}
 	rm -f ${COMPONENTS_O}
 
-test: clean debug
-ifdef VALGRIND
-	${VALGRIND} ${VALGRIND_OPTS} ./${EXE} -h
-else
-	./${EXE} -h
-endif
+all: clean ${ELF} ${EXE}
+elf: clean ${ELF}
+exe: clean ${EXE}
 
 built_libs/libz.a: zlib
 built_libs/libprotobuf-c.a: protobuf-c
+
+.PHONY: all clean test debug other_libs

@@ -1,9 +1,9 @@
-#include <inttypes.h>
-
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 
+#include <string.h>
+
+#include "memtracker.h"
 #include "protobuf_parser.h"
 
 uint64_t __bytes_to_u32(uint8_t *start, uint32_t *out_buffer)
@@ -106,10 +106,34 @@ void __msb_byte_seq_2_fieldnum(uint8_t *bytes, uint64_t len,
     *out_buffer = *out_buffer >> 3;
 }
 
+void set_output_buffer(PB_ProtoBuf_Struct **output_buffer, uint64_t *used,
+                       uint64_t *size, uint64_t field_number)
+{
+    if ((*used + 1) >= *size)
+    {
+        PB_ProtoBuf_Struct *new_data = croi_realloc(
+            *output_buffer, *size * 2 * sizeof(PB_ProtoBuf_Struct));
+        if (new_data == NULL)
+        {
+            memtracker_panic(
+                "Error in allocating memory when decoding the protobuf\n");
+        }
+
+        *size          *= 2;
+        *output_buffer  = new_data;
+    }
+
+    (*output_buffer)[*used].field_number  = field_number;
+    *used                                += 1;
+}
+
 void decode_unknown_protobuf(uint8_t *bytes, uint64_t bytes_size,
                              PB_ProtoBuf_Struct **out_buffer)
 {
-    (void)out_buffer;
+    *out_buffer                 = croi_calloc(10, sizeof(PB_ProtoBuf_Struct));
+    uint64_t out_buffer_size    = 10;
+    uint64_t out_buffer_used    = 0;
+
     bool was_msb_set            = false;
     uint64_t index_to_msb_start = 0;
 
@@ -120,10 +144,6 @@ void decode_unknown_protobuf(uint8_t *bytes, uint64_t bytes_size,
         uint64_t v_i          = 0;
         uint64_t u64          = 0;
         uint32_t u32          = 0;
-
-#ifdef ___CHIYO_TATSU_DEBUG
-        bool ln_flag = false;
-#endif
 
         if ((bytes[i] & 0x80))
         {
@@ -152,70 +172,67 @@ void decode_unknown_protobuf(uint8_t *bytes, uint64_t bytes_size,
         case PB_VI:
         {
             i += __decode_varint(&bytes[i + 1], &v_i);
-
-#ifdef ___CHIYO_TATSU_DEBUG
-            printf("Field Number: %3" PRIu64 " VI: %20" PRIu64
-                   " U64: %20" PRIu64 " U32: %20" PRIu32 " LN Flag: %s\n",
-                   field_number, v_i, u64, u32, (ln_flag) ? "true " : "false");
-#endif
+            set_output_buffer(out_buffer, &out_buffer_used, &out_buffer_size,
+                              field_number);
+            (*out_buffer)[out_buffer_used - 1].message   = &v_i;
+            (*out_buffer)[out_buffer_used - 1].wire_type = PB_VI;
             break;
         }
         case PB_64:
         {
             (void)__bytes_to_u64(&bytes[i + 1], &u64);
             i += BYTE_U64_SIZE;
-
-#ifdef ___CHIYO_TATSU_DEBUG
-            printf("Field Number: %3" PRIu64 " VI: %20" PRIu64
-                   " U64: %20" PRIu64 " U32: %20" PRIu32 " LN Flag: %s\n",
-                   field_number, v_i, u64, u32, (ln_flag) ? "true " : "false");
-#endif
+            set_output_buffer(out_buffer, &out_buffer_used, &out_buffer_size,
+                              field_number);
+            (*out_buffer)[out_buffer_used - 1].message   = &u64;
+            (*out_buffer)[out_buffer_used - 1].wire_type = PB_64;
             break;
         }
         case PB_LN:
         {
-            i += __decode_varint(&bytes[i + 1], &v_i);
+            uint64_t len_of_LN = __decode_varint(&bytes[i + 1], &v_i);
+            set_output_buffer(out_buffer, &out_buffer_used, &out_buffer_size,
+                              field_number);
+            (*out_buffer)[out_buffer_used - 1].wire_type = PB_LN;
+            if (v_i + 1 < 16384)
+            {
+                (*out_buffer)[out_buffer_used - 1].message =
+                    croi_calloc(v_i + 1, sizeof(uint8_t));
 
-#ifdef ___CHIYO_TATSU_DEBUG
-            ln_flag = true;
-            printf("Field Number: %3" PRIu64 " VI: %20" PRIu64
-                   " U64: %20" PRIu64 " U32: %20" PRIu32 " LN Flag: %s\n",
-                   field_number, v_i, u64, u32, (ln_flag) ? "true " : "false");
-#endif
+                if ((*out_buffer)[out_buffer_used - 1].message == NULL)
+                {
+                    memtracker_panic(
+                        "Error in allocating memory for the message "
+                        "inside the protobuf\n");
+                }
+
+                memcpy((*out_buffer)[out_buffer_used - 1].message,
+                       &bytes[i + len_of_LN + 2], len_of_LN);
+            }
+
+            i += len_of_LN;
             break;
         }
         case PB_SG:
         {
             uint64_t group_len  = __decode_varint(&bytes[i + 1], &v_i);
             i                  += group_len;
-
-#ifdef ___CHIYO_TATSU_DEBUG
-            printf("Field Number: %3" PRIu64 " VI: %20" PRIu64
-                   " U64: %20" PRIu64 " U32: %20" PRIu32 " LN Flag: %s\n",
-                   field_number, v_i, u64, u32, (ln_flag) ? "true " : "false");
-#endif
+            set_output_buffer(out_buffer, &out_buffer_used, &out_buffer_size,
+                              field_number);
             break;
         }
         case PB_EG:
         {
-
-#ifdef ___CHIYO_TATSU_DEBUG
-            printf("Field Number: %3" PRIu64 " VI: %20" PRIu64
-                   " U64: %20" PRIu64 " U32: %20" PRIu32 " LN Flag: %s\n",
-                   field_number, v_i, u64, u32, (ln_flag) ? "true " : "false");
-#endif
+            set_output_buffer(out_buffer, &out_buffer_used, &out_buffer_size,
+                              field_number);
             break;
         }
         case PB_32:
         {
             (void)__bytes_to_u32(&bytes[i + 1], &u32);
             i += BYTE_U32_SIZE;
-
-#ifdef ___CHIYO_TATSU_DEBUG
-            printf("Field Number: %3" PRIu64 " VI: %20" PRIu64
-                   " U64: %20" PRIu64 " U32: %20" PRIu32 " LN Flag: %s\n",
-                   field_number, v_i, u64, u32, (ln_flag) ? "true " : "false");
-#endif
+            set_output_buffer(out_buffer, &out_buffer_used, &out_buffer_size,
+                              field_number);
             break;
         }
         }

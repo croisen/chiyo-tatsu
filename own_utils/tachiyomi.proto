@@ -85,14 +85,11 @@ message BackupHistory {
 }
 
 message BackupMergedMangaReference {
-  // Define BackupMergedMangaReference fields as needed
 }
 
 message BackupFlatMetadata {
-  // Define BackupFlatMetadata fields as needed
 }
 
 enum UpdateStrategy {
   ALWAYS_UPDATE = 0;
-  // Define other update strategies as needed
 }
