@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout ChiyoTatsu
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   submodules: recursive
 
@@ -19,7 +19,7 @@ jobs:
 
             - name: Generate Version Number
               run: |
-                  CURRENT_VER="$(./increment_current_version.sh)"
+                  CURRENT_VER="$(./increment_version.sh)"
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
             - name: Compile ChiyoTatsu [Release]
