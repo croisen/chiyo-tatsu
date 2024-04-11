@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+message BackupPreference {
+    string key = 1;
+    PreferenceValue value = 2;
+}
+
+message BackupSourcePreferences {
+    string source_key = 1;
+    repeated BackupPreference prefs = 2;
+}
+
+message PreferenceValue {
+    oneof value {
+        IntPreferenceValue int_value = 1;
+        LongPreferenceValue long_value = 2;
+        FloatPreferenceValue float_value = 3;
+        StringPreferenceValue string_value = 4;
+        BooleanPreferenceValue boolean_value = 5;
+        StringSetPreferenceValue string_set_value = 6;
+    }
+}
+
+message IntPreferenceValue {
+    int32 value = 1;
+}
+
+message LongPreferenceValue {
+    int64 value = 1;
+}
+
+message FloatPreferenceValue {
+    float value = 1;
+}
+
+message StringPreferenceValue {
+    string value = 1;
+}
+
+message BooleanPreferenceValue {
+    bool value = 1;
+}
+
+message StringSetPreferenceValue {
+    repeated string value = 1;
+}

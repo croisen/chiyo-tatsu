@@ -1,228 +1,283 @@
-#ifndef CROI_LIB_0001_MEMTRACKER_H
-#define CROI_LIB_0001_MEMTRACKER_H
+#ifndef ___0001_CROI_C_RANDOM_HEADER_CODE___
+#define ___0001_CROI_C_RANDOM_HEADER_CODE___
 
-#include <stdbool.h>
+#include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-struct __mt_darr_for_ptr
-{
+void mTFree(void *ptr);
+void *mTMalloc(uint64_t size);
+void *mTCalloc(uint64_t nmemb, uint64_t size);
+void *mTRealloc(void *ptr, uint64_t size);
+
+void memTrackerInit(void);
+void memTrackerFree(void);
+void memTrackerFreeSignal(int sig);
+void memTrackerExpand(void);
+
+#define MTMaxLineWidth 80
+#define MTINFO         "[INFO]     "
+#define MTWARN         "[WARN]     "
+#define MTFAIL         "[ERROR]    " // This don't seem correct but I'mma go with it
+#define MTCRIT         "[CRITICAL] "
+
+// I feel like this is gonna cause some bugs later but eh
+#define memTrackerLog(msgPrefix, fmtMessage, ...)                              \
+    do {                                                                       \
+        int printLen = MTMaxLineWidth;                                         \
+        uint64_t neededSize =                                                  \
+            (uint64_t)snprintf(                                                \
+                NULL, 0, "(%s Line: %3" PRIu64 ") " msgPrefix fmtMessage,      \
+                __FILE__, (uint64_t)__LINE__, ##__VA_ARGS__                    \
+            ) +                                                                \
+            1;                                                                 \
+        char *theLog = calloc(neededSize, sizeof(char));                       \
+        sprintf(                                                               \
+            theLog, "(%s Line: %3" PRIu64 ") " msgPrefix fmtMessage, __FILE__, \
+            (uint64_t)__LINE__, ##__VA_ARGS__                                  \
+        );                                                                     \
+                                                                               \
+        char *copy         = theLog;                                           \
+        uint64_t theLogLen = strlen(theLog);                                   \
+        while ((theLog + theLogLen) >= copy) {                                 \
+            int wordLen = (int)strcspn(copy, " ");                             \
+            if (wordLen > printLen) {                                          \
+                printf("\n");                                                  \
+                printLen = MTMaxLineWidth;                                     \
+            }                                                                  \
+                                                                               \
+            if ((theLog + strlen(theLog)) == (copy + wordLen))                 \
+                printf("%.*s", wordLen, copy);                                 \
+            else                                                               \
+                printf("%.*s ", wordLen, copy);                                \
+                                                                               \
+            copy     += wordLen;                                               \
+            copy     += strcspn(copy, " ") + 1;                                \
+            printLen -= wordLen + 1;                                           \
+        }                                                                      \
+        free(theLog);                                                          \
+    } while (false)
+
+#define memTrackerPanic(exitCode, msgPrefix, fmtMessage, ...)                  \
+    do {                                                                       \
+        int printLen = MTMaxLineWidth;                                         \
+        uint64_t neededSize =                                                  \
+            (uint64_t)snprintf(                                                \
+                NULL, 0, "(%s Line: %3" PRIu64 ") " msgPrefix fmtMessage,      \
+                __FILE__, (uint64_t)__LINE__, ##__VA_ARGS__                    \
+            ) +                                                                \
+            1;                                                                 \
+        char *theLog       = calloc(neededSize, sizeof(char));                 \
+        uint64_t theLogLen = strlen(theLog);                                   \
+        sprintf(                                                               \
+            theLog, "(%s Line: %3" PRIu64 ") " msgPrefix fmtMessage, __FILE__, \
+            (uint64_t)__LINE__, ##__VA_ARGS__                                  \
+        );                                                                     \
+                                                                               \
+        char *copy = theLog;                                                   \
+        while ((theLog + theLogLen) >= copy) {                                 \
+            int wordLen = (int)strcspn(copy, " ");                             \
+            if (wordLen > printLen) {                                          \
+                printf("\n");                                                  \
+                printLen = MTMaxLineWidth;                                     \
+            }                                                                  \
+                                                                               \
+            if ((theLog + strlen(theLog)) == (copy + wordLen))                 \
+                printf("%.*s", wordLen, copy);                                 \
+            else                                                               \
+                printf("%.*s ", wordLen, copy);                                \
+                                                                               \
+            copy     += wordLen;                                               \
+            copy     += strcspn(copy, " ") + 1;                                \
+            printLen -= wordLen + 1;                                           \
+        }                                                                      \
+        free(theLog);                                                          \
+        exit(exitCode);                                                        \
+    } while (false)
+
+#endif // ___0001_CROI_C_RANDOM_HEADER_CODE___
+
+#ifdef ___0001_CROI_C_RANDOM_HEADER_CODE_IMPL___
+
+#include <inttypes.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct MemTrackerArr {
     bool init;
-    size_t size;
-    size_t used;
+    uint64_t size;
+    uint64_t used;
     void **ptrs;
+} MemTrackerArr;
+
+MemTrackerArr memTracker = {
+    false,
+    0,
+    0,
+    NULL,
 };
 
-typedef struct __mt_darr_for_ptr MT_DA[1];
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
-#define memtracker_panic(message, ...)       \
-    fprintf(stderr, message, ##__VA_ARGS__); \
-    exit(EXIT_FAILURE)
-
-extern void croi_free(void *ptr);
-extern void *croi_calloc(size_t nmemb, size_t size);
-extern void *croi_malloc(size_t size);
-extern void *croi_realloc(void *ptr, size_t size);
-
-#endif
-
-#ifdef CROI_LIB_0001_MEMTRACKER_IMPL_H
-
-MT_DA alloced_ptrs = {0};
-
-extern int __memtracker_sort(const void *a, const void *b);
-extern void __memtracker_init(void);
-extern void __memtracker_free_void(void);
-extern void __memtracker_free_sig(int dummy);
-
-int __memtracker_sort(const void *a, const void *b)
+void memTrackerInit(void)
 {
-    void *c = *(void **)a;
-    void *d = *(void **)b;
+    memTracker.init = true;
+    memTracker.size = 8;
+    memTracker.used = 0;
+    memTracker.ptrs = calloc(memTracker.size, sizeof(void *));
+    if (memTracker.ptrs == NULL)
+        memTrackerPanic(
+            1, MTCRIT, "Failed to initialize memtracker for bread parser :(\n"
+        );
 
-    // Sorted from highest to lowest
-    return (uint64_t)d - (uint64_t)c;
+    atexit(memTrackerFree);
+    signal(SIGINT, memTrackerFreeSignal);
 }
 
-void __memtracker_init(void)
+void memTrackerFreeSignal(int sig)
 {
-    atexit(__memtracker_free_void);
-    signal(SIGINT, __memtracker_free_sig);
-    signal(SIGSEGV, __memtracker_free_sig);
+    exit(sig);
+}
 
-    alloced_ptrs->init = true;
-    alloced_ptrs->size = 4;
-    alloced_ptrs->used = 0;
+void memTrackerFree(void)
+{
+    for (uint64_t i = 0; i < memTracker.used; i += 1) {
+        free(memTracker.ptrs[i]);
+    }
+    memTracker.size = 0;
+    memTracker.used = 0;
+    memTracker.init = 0;
+    free(memTracker.ptrs);
+}
 
-    alloced_ptrs->ptrs = calloc(alloced_ptrs->size, sizeof(void *));
-    if (alloced_ptrs->ptrs == NULL)
-    {
-        __bread_panic("Cannot initialize memory tracker, calloc "
-                      "returned NULL\n");
+void memTrackerExpand(void)
+{
+    if (memTracker.size == (memTracker.used + 1)) {
+        void **newTracker =
+            realloc(memTracker.ptrs, memTracker.size * sizeof(void *) * 2);
+        if (newTracker == NULL)
+            memTrackerPanic(
+                EXIT_FAILURE, MTCRIT,
+                "Failed to expand list of pointers for the mem "
+                "tracker of bread parser...\n"
+            );
+
+        for (uint64_t i = memTracker.size; i < memTracker.size * 2; i += 1) {
+            newTracker[i] = NULL;
+        }
+
+        memTracker.size *= 2;
+        memTracker.ptrs  = newTracker;
     }
 }
 
-void __memtracker_free_void(void)
+int64_t memTrackerFindPtr(void *ptr)
 {
-    for (uint64_t i = 0; i < alloced_ptrs->size; i += 1)
-    {
-#ifdef ___MEMTRACKER_DEBUG
-        printf("Freeing alloced_ptrs: 0x%016" PRIx64 "\n",
-               (uint64_t)alloced_ptrs->ptrs[i]);
-#endif
-        free(alloced_ptrs->ptrs[i]);
+    for (uint64_t i = 0; i < memTracker.used; i += 1) {
+        if (memTracker.ptrs[i] == ptr)
+            return i;
     }
 
-#ifdef ___MEMTRACKER_DEBUG
-    printf("Freeing alloced_ptrs: 0x%016" PRIx64 "\n",
-           (uint64_t)alloced_ptrs->ptrs);
-#endif
-    free(alloced_ptrs->ptrs);
+    return -1;
 }
 
-void __memtracker_free_sig(int dummy)
+void mTFree(void *ptr)
 {
-    fprintf(stderr, "Signal %s caught, now exiting...\n", strsignal(dummy));
-    exit(dummy);
-}
-
-void *croi_calloc(uint64_t nmemb, uint64_t size)
-{
-    if (!alloced_ptrs->init)
-    {
-        __memtracker_init();
-    }
-
-    void *res = calloc(nmemb, size);
-    if (alloced_ptrs->size <= (alloced_ptrs->used + 1))
-    {
-        void **new_arr = realloc(alloced_ptrs->ptrs,
-                                 sizeof(void *) * (alloced_ptrs->size * 2));
-        if (new_arr == NULL)
-        {
-            free(res);
-            __bread_panic("Cannot track new memory given by croi_calloc, "
-                          "realloc return NULL\n");
-        }
-
-        for (uint64_t i                       = (alloced_ptrs->size - 1);
-             i < (alloced_ptrs->size * 2); i += 1)
-        {
-            new_arr[i] = NULL;
-        }
-
-        alloced_ptrs->ptrs  = new_arr;
-        alloced_ptrs->size *= 2;
-    }
-
-    if (res != NULL)
-    {
-        alloced_ptrs->ptrs[alloced_ptrs->used]  = res;
-        alloced_ptrs->used                     += 1;
-    }
-
-    return res;
-}
-
-void *croi_malloc(uint64_t size)
-{
-    if (!alloced_ptrs->init)
-    {
-        __memtracker_init();
-    }
-
-    void *res = malloc(size);
-    if (alloced_ptrs->size <= (alloced_ptrs->used + 1))
-    {
-        void **new_arr = realloc(alloced_ptrs->ptrs,
-                                 sizeof(void *) * (alloced_ptrs->size * 2));
-        if (new_arr == NULL)
-        {
-            free(res);
-            __bread_panic("Cannot track new memory given by croi_malloc, "
-                          "realloc return NULL\n");
-        }
-
-        for (uint64_t i                       = (alloced_ptrs->size - 1);
-             i < (alloced_ptrs->size * 2); i += 1)
-        {
-            new_arr[i] = NULL;
-        }
-
-        alloced_ptrs->ptrs  = new_arr;
-        alloced_ptrs->size *= 2;
-    }
-
-    if (res != NULL)
-    {
-        alloced_ptrs->ptrs[alloced_ptrs->used]  = res;
-        alloced_ptrs->used                     += 1;
-    }
-
-    return res;
-}
-
-void *croi_realloc(void *ptr, uint64_t size)
-{
-    if (!alloced_ptrs->init)
-    {
-        __memtracker_init();
-    }
-
-    void *res = realloc(ptr, size);
-    if (alloced_ptrs->size <= (alloced_ptrs->used + 1))
-    {
-        void **new_arr = realloc(alloced_ptrs->ptrs,
-                                 sizeof(void *) * (alloced_ptrs->size * 2));
-        if (new_arr == NULL)
-        {
-            free(res);
-            __bread_panic("Cannot track new memory given by croi_realloc, "
-                          "realloc return NULL\n");
-        }
-
-        for (uint64_t i                       = (alloced_ptrs->size - 1);
-             i < (alloced_ptrs->size * 2); i += 1)
-        {
-            new_arr[i] = NULL;
-        }
-
-        alloced_ptrs->ptrs  = new_arr;
-        alloced_ptrs->size *= 2;
-    }
-
-    for (uint64_t i = 0; i < alloced_ptrs->used; i += 1)
-    {
-        if (res != NULL && alloced_ptrs->ptrs[i] == ptr)
-        {
-            alloced_ptrs->ptrs[i] = res;
-            goto bread_realloc_ret;
+    int64_t ptrIndex = -1;
+    for (uint64_t i = 0; i < memTracker.used; i += 1) {
+        if (memTracker.ptrs[i] == ptr) {
+            ptrIndex = i;
+            break;
         }
     }
 
-    alloced_ptrs->ptrs[alloced_ptrs->used]  = res;
-    alloced_ptrs->used                     += 1;
-
-bread_realloc_ret:
-    return res;
-}
-
-void croi_free(void *ptr)
-{
-    qsort(alloced_ptrs->ptrs, alloced_ptrs->used, sizeof(void *),
-          __memtracker_sort);
-    uint64_t key = (uint64_t)ptr;
-    void **item  = bsearch(&key, alloced_ptrs->ptrs, alloced_ptrs->used,
-                           sizeof(void *), __memtracker_sort);
-    if (item != NULL)
-    {
-        *item = NULL;
-        qsort(alloced_ptrs->ptrs, alloced_ptrs->used, sizeof(void *),
-              __memtracker_sort);
+    if (ptrIndex != -1) {
+        // Did I use memmove correctly to do this?
+        // [0, 1, 2] pop(1)
+        // [0, gone, 2]
+        // [0, 2]
+        memmove(
+            memTracker.ptrs + ptrIndex, memTracker.ptrs + ptrIndex + 1,
+            (memTracker.used - 1 - ptrIndex) * sizeof(void *)
+        );
+        memTracker.used                  -= 1;
+        memTracker.ptrs[memTracker.used]  = NULL;
     }
 
+    // Holy crap I forgot to call free from this (I did it again...)
     free(ptr);
-    alloced_ptrs->used -= 1;
 }
 
-#endif
+void *mTMalloc(uint64_t size)
+{
+    if (!memTracker.init)
+        memTrackerInit();
+
+    void *res = malloc((size_t)size);
+    if (res == NULL)
+        memTrackerPanic(
+            EXIT_FAILURE, MTCRIT,
+            "Malloc returned null when trying to allocate memory for\n"
+        );
+
+    memTrackerExpand();
+
+    memTracker.ptrs[memTracker.used]  = res;
+    memTracker.used                  += 1;
+
+    return res;
+}
+
+void *mTCalloc(uint64_t nmemb, uint64_t size)
+{
+    if (!memTracker.init)
+        memTrackerInit();
+
+    void *res = calloc((size_t)nmemb, (size_t)size);
+    if (res == NULL)
+        memTrackerPanic(
+            EXIT_FAILURE, MTCRIT,
+            "Calloc returned null when trying to allocate memory\n"
+        );
+
+    memTrackerExpand();
+    memTracker.ptrs[memTracker.used]  = res;
+    memTracker.used                  += 1;
+    return res;
+}
+
+void *mTRealloc(void *ptr, uint64_t size)
+{
+    if (!memTracker.init)
+        memTrackerInit();
+
+    int64_t ptrIndex = memTrackerFindPtr(ptr);
+    void *res        = realloc(ptr, (size_t)size);
+    if (res == NULL)
+        memTrackerPanic(
+            EXIT_FAILURE, MTCRIT,
+            "Realloc returned null when trying to allocate memory\n"
+        );
+
+    memTrackerExpand();
+    if (ptrIndex != -1)
+        memTracker.ptrs[ptrIndex] = res;
+    else {
+        memTracker.ptrs[memTracker.used]  = res;
+        memTracker.used                  += 1;
+    }
+
+    return res;
+}
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+#endif // ___0001_CROI_C_RANDOM_HEADER_CODE_IMPL___

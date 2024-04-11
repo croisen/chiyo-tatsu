@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+enum UpdateStrategy {
+  ALWAYS_UPDATE = 0;
+  ONLY_FETCH_ONCE = 1;
+}

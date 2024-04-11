@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-extern unsigned char **input_uncompressed;
-
-uint64_t tachiyomi_gzip_load(const char *filename, uint8_t **out_buf);
+uint64_t tachiyomiGzipLoad(const char *filename, uint8_t **out_buf);
 
 #endif

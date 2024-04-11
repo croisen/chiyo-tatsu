@@ -4,3 +4,9 @@
 [submodule "other_libs/protobuf-c"]
 	path = other_libs/protobuf-c
 	url = https://github.com/protobuf-c/protobuf-c.git
+[submodule "manga_src/tachiyomi_src"]
+	path = manga_src/tachiyomi_src
+	url = https://github.com/ZhanZiyuan/tachiyomi.git
+[submodule "manga_src/kotatsu_src"]
+	path = manga_src/kotatsu_src
+	url = https://github.com/KotatsuApp/Kotatsu.git
