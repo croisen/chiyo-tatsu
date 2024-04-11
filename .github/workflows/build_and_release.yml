@@ -18,7 +18,8 @@ jobs:
                   submodules: recursive
 
             - name: Install build essentials
-              run: sudo apt install -y build-essential mingw-w64
+              run: sudo apt install -y build-essential mingw-w64\
+                  protobuf-compiler libprotobuf-dev libprotoc-dev
 
             - name: Compile ChiyoTatsu [Release]
               run: |
