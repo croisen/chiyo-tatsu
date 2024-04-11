@@ -20,7 +20,6 @@ jobs:
             - name: Generate Version Number
               run: |
                   CURRENT_VER="$(./increment_version.sh)"
-                  git tag $CURRENT_VER
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
             - name: Compile ChiyoTatsu [Release]
@@ -32,7 +31,7 @@ jobs:
 
             - name: Create Release
               run: |
-                  gh release create "$CURRENT_VER" --draft=false --title "Release? $CURRENT_VER" --notes "$(git log --pretty=format:"%s %b" -n 1)"
+                  gh release create "$CURRENT_VER" --draft=false --title "Release? $CURRENT_VER" --notes "$(git log --pretty=format:"%s %b" -n 1)" --target "$CURRENT_VER"
                   gh release upload "$CURRENT_VER" "chiyotatsu-$CURRENT_VER-$GITHUB_SHA.elf"
               env:
                   CURRENT_VER: ${{ env.CURRENT_VER }}
