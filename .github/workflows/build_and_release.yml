@@ -33,6 +33,7 @@ jobs:
               run: |
                   gh release create "$CURRENT_VER" --draft=false --title "Release? $CURRENT_VER" --notes "$(git log --pretty=format:"%s %b" -n 1)"
                   gh release upload "$CURRENT_VER" "chiyotatsu-$CURRENT_VER-$GITHUB_SHA.elf"
+                  git tag $CURRENT_VER
               env:
                   CURRENT_VER: ${{ env.CURRENT_VER }}
                   GH_TOKEN: ${{ github.token }}
