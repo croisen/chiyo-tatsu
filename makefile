@@ -27,7 +27,8 @@ ${ELF}: ${OTHER_LIBS} ${COMPONENTS_O}
 		${LIBS} ${LIBS_DIR}
 
 ${COMPONENTS_O}:
-	${CC} ${CFLAGS} ${OPTS} -o $@ -c ${patsubst %.o,%.c,$@} ${NOWARN}
+	${CC} ${CFLAGS} ${OPTS} -o $@ -c ${patsubst %.o,%.c,$@} ${NOWARN} \
+		${LIBS} ${LIBS_DIR}
 
 ${patsubst %,%_DEBUG,${COMPONENTS_O}}:
 	${CC} ${CFLAGS} ${OPTS_DEBUG} -o ${patsubst %_DEBUG,%,$@}\
