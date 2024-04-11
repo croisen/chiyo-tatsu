@@ -20,6 +20,7 @@ jobs:
             - name: Generate Version Number
               run: |
                   CURRENT_VER="$(./increment_version.sh)"
+                  git tag "$CURRENT_VER"
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
             - name: Compile ChiyoTatsu [Release]
