@@ -6,7 +6,7 @@
 void defineArgs(void)
 {
     bParserSetProgramName("chiyotatsu");
-    bParserSetProgramVersion("3.0.1");
+    bParserSetProgramVersion("0.0.1");
     bParserSetAuthorName("croisen");
     bParserSetAuthorEmail("andrewjames.git.gan@gmail.com");
 
