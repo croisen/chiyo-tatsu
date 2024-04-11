@@ -35,3 +35,4 @@ jobs:
                   gh release upload "chiyotatsu-$CURRENT_VER-$GITHUB_SHA.elf"
               env:
                   CURRENT_VER: ${{ env.CURRENT_VER }}
+                  GH_TOKEN: ${{ github.token }}
