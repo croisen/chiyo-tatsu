@@ -24,10 +24,10 @@ jobs:
               run: |
                   make elf
                   mv chiyotatsu.elf chiyotatsu-${GITHUB_SHA}.elf
-                  export CC=x86_64-w64-mingw32-gcc
-                  export CXX=x86_64-w64-mingw32-g++
-                  make exe
-                  mv chiyotatsu.exe chiyotatsu-${GITHUB_SHA}.exe
+                  #export CC=x86_64-w64-mingw32-gcc
+                  #export CXX=x86_64-w64-mingw32-g++
+                  #make exe
+                  #mv chiyotatsu.exe chiyotatsu-${GITHUB_SHA}.exe
 
             - name: Get commit message
               id: get_commit_message
