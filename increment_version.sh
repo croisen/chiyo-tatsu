@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 LATEST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null || echo "0.0.0")
 
