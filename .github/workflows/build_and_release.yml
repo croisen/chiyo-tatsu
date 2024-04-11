@@ -23,37 +23,37 @@ jobs:
             - name: Compile ChiyoTatsu [Release]
               run: |
                   make elf
-                  mv -v chiyotatsu.elf chiyotatsu-${{github.sha}}.elf
+                  mv -v chiyotatsu.elf chiyotatsu-$GITHUB_SHA.elf
                   #export CC=x86_64-w64-mingw32-gcc
                   #export CXX=x86_64-w64-mingw32-g++
                   #make exe
-                  #mv chiyotatsu.exe chiyotatsu-${{github.sha}}.exe
+                  #mv chiyotatsu.exe chiyotatsu-$GITHUB_SHA.exe
 
             - name: Get commit message
               id: get_commit_message
               run: |
                   COMMIT_MESSAGE="$(git log --pretty=format:'-   %s' | head -n1)"
-                  echo "::set-output name=COMMIT_MESSAGE::COMMIT_MESSAGE"
+                  echo "name=COMMIT_MESSAGE::COMMIT_MESSAGE" >> $GITHUB_STATE
 
             - name: Get latest tag or default to v0.0.0
               id: get_latest_tag
               run: |
                   TAG=$(git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0")
-                  echo "::set-output name=TAG::TAG"
+                  echo "name=TAG::TAG" >> $GITHUB_STATE
 
             - name: Increment Current Tag
               id: increment_current_tag
               run: |
                   TAG=${{ steps.get_latest_tag.outputs.TAG }}
                   NEXT_TAG=$(echo "$TAG" | awk -F"." '{ print $1"."$2"."$3 + 1 }')
-                  echo "::set-output name=NEXT_TAG::NEXT_TAG"
+                  echo "name=NEXT_TAG::NEXT_TAG" >> $GITHUB_STATE
 
             - name: Upload ChiyoTatsu
               uses: actions/upload-artifact@v2
               with:
                   name: release-artifact
                   path: |
-                      chiyotatsu-${{github.sha}}.elf
+                      chiyotatsu-$GITHUB_SHA.elf
 
             - name: Create Release
               id: create_release
