@@ -7,6 +7,10 @@
  * May I use it correctly...
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -142,10 +146,18 @@ void *bParserGetArg(const char shortOpt, const char *longOpt, uint64_t index);
         exit(exitCode);                                                        \
     } while (false)
 
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
 #endif // __CROI_BREAD_PARSER_H__
 
 // #define __CROI_BREAD_PARSER_IMPL__
 #ifdef __CROI_BREAD_PARSER_IMPL__
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 #include <signal.h>
 #include <stdarg.h>
@@ -1108,5 +1120,9 @@ void *bParserGetArg(const char shortOpt, const char *longOpt, uint64_t index)
 
     return args[index];
 }
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // __CROI_BREAD_PARSER_IMPL__

@@ -15,12 +15,11 @@ jobs:
                   submodules: recursive
 
             - name: Install build essentials
-              run: sudo apt install -y git gh build-essential mingw-w64 protobuf-compiler libprotobuf-dev libprotoc-dev libprotobuf-c1 libprotobuf-c-dev
+              run: sudo apt install -y git gh build-essential mingw-w64 protobuf-compiler libprotobuf-dev libprotoc-dev libprotobuf-c1 libprotobuf-c-dev zlib1g zlib1g-dev
 
             - name: Generate Version Number
               run: |
                   CURRENT_VER="$(./increment_version.sh)"
-                  git tag "$CURRENT_VER"
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
             - name: Compile ChiyoTatsu [Release]

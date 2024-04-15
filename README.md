@@ -2,42 +2,14 @@
 
 A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 
-## Todo (While using C)
+## Struggles
 
--   [x] Get my own header library commandline parser
--   [x] Close the files when there's a sudden exit
--   [x] Use make as a build system for other c files inside the others folder
--   [x] Decompress the tachiyomi backup file
--   [ ] After losing my sanity, rewrite this in kotlin instead
--   [ ] Get the documentation for the tachiyomi backup file
--   [ ] Try to parse the tachiyomi backup file
--   [ ] Get the documentation for the kotatsu backup file
--   [ ] Struggle converting between the two
--   [ ] Struggle in writing the zip file backup of kotatsu
+### In C
 
-## Manual Installation (It's very incomplete though)
+-   Creating a self-made argparser (v1 in 3 days, v2 in 7 days)
+-   Making the example usage of zlib fit my needs
+-   protobuf-c doesn't support 'optional' in proto3 yet
 
-Try to have all the dependencies installed and run the following
+### In C++
 
-```bash
-git clone "https://github.com/croisen/chiyo-tatsu.git"
-cd chiyo-tatsu/
-make
-```
-
-## External Libraries Used
-
--   [protobuf-c](https://github.com/protobuf-c/protobuf-c)
--   [zlib](https://github.com/madler/zlib)
-
-## Dependencies of said External Libraries
-
--   automake
--   autoconf
--   binutils
--   cmake
--   make
--   protoc
-
--   libtool
--   libprotobuf
+-   Dunno I'mma start today

@@ -1,6 +1,10 @@
 #ifndef ___0001_CROI_C_RANDOM_HEADER_CODE___
 #define ___0001_CROI_C_RANDOM_HEADER_CODE___
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -96,9 +100,17 @@ void memTrackerExpand(void);
         exit(exitCode);                                                        \
     } while (false)
 
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
 #endif // ___0001_CROI_C_RANDOM_HEADER_CODE___
 
 #ifdef ___0001_CROI_C_RANDOM_HEADER_CODE_IMPL___
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 #include <inttypes.h>
 #include <signal.h>
@@ -113,17 +125,12 @@ typedef struct MemTrackerArr {
     uint64_t used;
     void **ptrs;
 } MemTrackerArr;
-
 MemTrackerArr memTracker = {
     false,
     0,
     0,
     NULL,
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 
 void memTrackerInit(void)
 {
