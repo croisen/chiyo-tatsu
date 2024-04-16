@@ -26,8 +26,8 @@ jobs:
               run: |
                   go build -ldflags="-s -w" -o chiyotatsu.elf ./chiyotatsu.go
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
-                  mv -v chiyotatsu.elf "chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.elf"
-                  mv -v chiyotatsu.exe "chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.exe"
+                  mv -v chiyotatsu.elf "chiyotatsu-$CURRENT_VER-${{ github.sha }}.elf"
+                  mv -v chiyotatsu.exe "chiyotatsu-$CURRENT_VER-${{ github.sha }}.exe"
               env:
                   CURRENT_VER: ${{ env.CURRENT_VER }}
 
