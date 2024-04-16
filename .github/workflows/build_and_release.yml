@@ -26,32 +26,26 @@ jobs:
               run: |
                   go build -ldflags="-s -w" -o chiyotatsu.elf ./chiyotatsu.go
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
-                  mv -v chiyotatsu.elf "chiyotatsu-$CURRENT_VER-${{ github.sha }}.elf"
-                  mv -v chiyotatsu.exe "chiyotatsu-$CURRENT_VER-${{ github.sha }}.exe"
+                  mv -v chiyotatsu.elf "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf"
+                  mv -v chiyotatsu.exe "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe"
               env:
-                  CURRENT_VER: ${{ env.CURRENT_VER }}
 
             - name: Create Release
               uses: actions/create-release@v1
               with:
-                  tag_name: ${{ CURRENT_VER }}
-                  release_name: 'Release ${{ CURRENT_VER }}'
+                  tag_name: ${{ env.CURRENT_VER }}
+                  release_name: 'Release ${{ env.CURRENT_VER }}'
                   body: "$(git log --pretty=format:'%B' -n 1)"
                   draft: false
                   prerelease: false
-              env:
-                  CURRENT_VER: ${{ env.CURRENT_VER }}
-                  GH_TOKEN: ${{ github.token }}
 
             - name: Upload Release Asset
               uses: actions/upload-artifact@v3
               with:
                   name: chiyotatsu-release-artifact
                   path: |
-                      'chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.elf'
-                      'chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.exe'
-              env:
-                  CURRENT_VER: ${{ env.CURRENT_VER }}
+                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
+                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
 
               # Dunno if this is gonna cause an infinite loop but eh
             - name: Push the Tag
