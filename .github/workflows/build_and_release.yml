@@ -15,7 +15,7 @@ jobs:
                   submodules: recursive
 
             - name: Install build essentials
-              run: sudo apt install -y git gh build-essential mingw-w64 protobuf-compiler libprotobuf-dev libprotoc-dev libprotobuf-c1 libprotobuf-c-dev zlib1g zlib1g-dev
+              run: sudo apt install -y git go
 
             - name: Generate Version Number
               run: |
@@ -24,15 +24,43 @@ jobs:
 
             - name: Compile ChiyoTatsu [Release]
               run: |
-                  make elf
-                  mv -v chiyotatsu.elf "chiyotatsu-$CURRENT_VER-$GITHUB_SHA.elf"
+                  go build -ldflags="-s -w" -o chiyotatsu.elf ./chiyotatsu.go
+                  GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
+                  mv -v chiyotatsu.elf "chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.elf"
+                  mv -v chiyotatsu.exe "chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.exe"
               env:
                   CURRENT_VER: ${{ env.CURRENT_VER }}
 
             - name: Create Release
-              run: |
-                  gh release create "$CURRENT_VER" --draft=false --title "Release? $CURRENT_VER" --notes "$(git log --pretty=format:"%s %b" -n 1)" --target main
-                  gh release upload "$CURRENT_VER" "chiyotatsu-$CURRENT_VER-$GITHUB_SHA.elf"
+              uses: actions/create-release@v1
+              with:
+                  tag_name: ${{ CURRENT_VER }}
+                  release_name: 'Release ${{ CURRENT_VER }}'
+                  body: "$(git log --pretty=format:'%B' -n 1)"
+                  draft: false
+                  prerelease: false
               env:
                   CURRENT_VER: ${{ env.CURRENT_VER }}
                   GH_TOKEN: ${{ github.token }}
+
+            - name: Upload Release Asset
+              uses: actions/upload-artifact@v3
+              with:
+                  name: chiyotatsu-release-artifact
+                  path: |
+                      'chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.elf'
+                      'chiyotatsu-${{ CURRENT_VER }}-${{ github.sha }}.exe'
+              env:
+                  CURRENT_VER: ${{ env.CURRENT_VER }}
+
+              # Dunno if this is gonna cause an infinite loop but eh
+            - name: Push the Tag
+              uses: actions/checkout@v3 # Checkout again to ensure latest state
+              with:
+                  fetch-depth: 0 # Get all refs and objects
+
+            - name: Create Git Tag
+              run: git tag -a ${{ env.CURRENT_VER }} -m "Release ${{ env.CURRENT_VER }}"
+
+            - name: Push the Tag
+              run: git push origin ${{ env.CURRENT_VER }}

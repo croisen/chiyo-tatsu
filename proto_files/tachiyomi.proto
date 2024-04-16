@@ -1,16 +1,19 @@
 syntax = "proto3";
 
+package tachiyomi_backups;
+option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/tachiyomi";
+
 import 'backup_category.proto';
 import 'backup_manga.proto';
 import 'backup_preference.proto';
 import 'backup_source.proto';
 
 message Backup {
-    repeated BackupManga mangaBackup = 1;
-    repeated BackupCategory categories = 2;
+    repeated tachiyomi_manga.BackupManga mangaBackup = 1;
+    repeated tachiyomi_categories.BackupCategory categories = 2;
 
-    repeated BrokenBackupSource brokenSources = 100;
-    repeated BackupSource sources = 101;
-    repeated BackupPreference preferences = 104;
-    repeated BackupSourcePreferences sourcePreferences = 105;
+    repeated tachiyomi_source.BrokenBackupSource brokenSources = 100;
+    repeated tachiyomi_source.BackupSource sources = 101;
+    repeated tachiyomi_preference.BackupPreference preferences = 104;
+    repeated tachiyomi_preference.BackupSourcePreferences sourcePreferences = 105;
 }

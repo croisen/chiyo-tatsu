@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+package tachiyomi_chapters;
+option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_chapters";
+
 message BackupChapter {
     string url = 1;
     string name = 2;

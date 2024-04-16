@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+package tachiyomi_categories;
+option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_category";
+
 message BackupCategory {
     string name = 1;
     int32 order = 2;

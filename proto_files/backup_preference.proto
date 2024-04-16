@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+package tachiyomi_preference;
+option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_preference";
+
 message BackupPreference {
     string key = 1;
     PreferenceValue value = 2;
