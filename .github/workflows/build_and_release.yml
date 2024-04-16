@@ -28,7 +28,6 @@ jobs:
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
                   mv -v chiyotatsu.elf "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf"
                   mv -v chiyotatsu.exe "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe"
-              env:
 
             - name: Create Release
               uses: actions/create-release@v1
