@@ -49,11 +49,18 @@ jobs:
               with:
                   name: chiyotatsu-release-artifact
                   path: |
-                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
-                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
+                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
+                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
 
             - name: Create Git Tag
-              run: git tag -a ${{ env.CURRENT_VER }} -m "Release ${{ env.CURRENT_VER }}"
+              run: |
+                  git config user.name croisen-bot
+                  git config user.email andrewjames.git.gan@gmail.com
+                  git tag -a ${{ env.CURRENT_VER }} -m "Release ${{ env.CURRENT_VER }}"
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
 
             - name: Push the Tag
-              run: git push origin ${{ env.CURRENT_VER }}
+              run: git push --tags
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
