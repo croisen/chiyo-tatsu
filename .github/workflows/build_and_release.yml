@@ -41,6 +41,8 @@ jobs:
                   body: "$(git log --pretty=format:'%B' -n 1)"
                   draft: false
                   prerelease: false
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
 
             - name: Upload Release Asset
               uses: actions/upload-artifact@v3
