@@ -38,7 +38,7 @@ jobs:
               with:
                   tag_name: ${{ env.CURRENT_VER }}
                   release_name: 'Release ${{ env.CURRENT_VER }}'
-                  body: "$(git log --pretty=format:'%B' -n 1)"
+                  body: ${{ github.event.head_commit.message }}
                   draft: false
                   prerelease: false
               env:
@@ -49,5 +49,5 @@ jobs:
               with:
                   name: chiyotatsu-release-artifact
                   path: |
-                      './chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
-                      './chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
+                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
+                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
