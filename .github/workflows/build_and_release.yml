@@ -15,7 +15,10 @@ jobs:
                   submodules: recursive
 
             - name: Install build essentials
-              run: sudo apt install -y git golang
+              run: |
+                  sudo apt install -y git
+                  wget https://go.dev/dl/go1.22.2.linux-amd64.tar.gz
+                  sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz
 
             - name: Generate Version Number
               run: |
@@ -24,6 +27,7 @@ jobs:
 
             - name: Compile ChiyoTatsu [Release]
               run: |
+                  export PATH=$PATH:/usr/local/go/bin
                   go build -ldflags="-s -w" -o chiyotatsu.elf ./chiyotatsu.go
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
                   mv -v chiyotatsu.elf "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf"
