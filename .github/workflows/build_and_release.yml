@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout ChiyoTatsu
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
               with:
                   fetch-depth: 0
 
@@ -34,23 +34,17 @@ jobs:
                   mv -v chiyotatsu.exe "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe"
                   pwd
 
-            - name: Create Release
-              uses: actions/create-release@v1
-              with:
-                  tag_name: ${{ env.CURRENT_VER }}
-                  release_name: 'Release ${{ env.CURRENT_VER }}'
-                  body: ${{ github.event.head_commit.message }}
-                  draft: false
-                  prerelease: false
-              env:
-                  GITHUB_TOKEN: ${{ github.token }}
-
               # Why u not getting the binaries man?
               # Please don't tell me it's because of the quotation marks...
-            - name: Upload Release Asset
-              uses: actions/upload-artifact@v3
+              # I was using the wrong action too!?
+            - name: Create Release and Upload Assets
+              uses: softprops/action-gh-release@v2
               with:
-                  name: chiyotatsu-release-artifact
-                  path: |
+                  name: 'Release ${{ env.CURRENT_VER }}'
+                  body: ${{ github.event.head_commit.message }}
+                  tag_name: ${{ env.CURRENT_VER }}
+                  files: |
                       chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf
                       chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe
+                  draft: false
+                  prerelease: false
