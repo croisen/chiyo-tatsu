@@ -50,5 +50,5 @@ jobs:
               with:
                   name: chiyotatsu-release-artifact
                   path: |
-                      '${{ GITHUB_WORKSPACE }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
-                      '${{ GITHUB_WORKSPACE }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
+                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
+                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
