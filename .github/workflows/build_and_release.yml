@@ -32,7 +32,6 @@ jobs:
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
                   mv -v chiyotatsu.elf "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf"
                   mv -v chiyotatsu.exe "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe"
-                  pwd
 
             - name: Create Release
               uses: actions/create-release@v1
@@ -50,5 +49,5 @@ jobs:
               with:
                   name: chiyotatsu-release-artifact
                   path: |
-                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
-                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
+                      './chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
+                      './chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
