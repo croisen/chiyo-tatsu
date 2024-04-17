@@ -12,7 +12,7 @@ jobs:
             - name: Checkout ChiyoTatsu
               uses: actions/checkout@v3
               with:
-                  submodules: recursive
+                  fetch-depth: 0
 
             - name: Install build essentials
               run: |
@@ -51,12 +51,6 @@ jobs:
                   path: |
                       'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
                       'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
-
-              # Dunno if this is gonna cause an infinite loop but eh
-            - name: Push the Tag
-              uses: actions/checkout@v3 # Checkout again to ensure latest state
-              with:
-                  fetch-depth: 0 # Get all refs and objects
 
             - name: Create Git Tag
               run: git tag -a ${{ env.CURRENT_VER }} -m "Release ${{ env.CURRENT_VER }}"
