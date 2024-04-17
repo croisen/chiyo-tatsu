@@ -32,6 +32,7 @@ jobs:
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
                   mv -v chiyotatsu.elf "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf"
                   mv -v chiyotatsu.exe "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe"
+                  pwd
 
             - name: Create Release
               uses: actions/create-release@v1
@@ -44,10 +45,12 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ github.token }}
 
+              # Why u not getting the binaries man?
+              # Please don't tell me it's because of the quotation marks...
             - name: Upload Release Asset
               uses: actions/upload-artifact@v3
               with:
                   name: chiyotatsu-release-artifact
                   path: |
-                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
-                      'chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
+                      chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf
+                      chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe
