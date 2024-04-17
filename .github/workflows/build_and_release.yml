@@ -32,6 +32,7 @@ jobs:
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
                   mv -v chiyotatsu.elf "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf"
                   mv -v chiyotatsu.exe "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe"
+                  pwd
 
             - name: Create Release
               uses: actions/create-release@v1
@@ -49,18 +50,5 @@ jobs:
               with:
                   name: chiyotatsu-release-artifact
                   path: |
-                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
-                      '${{ github.workspace }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
-
-            - name: Create Git Tag
-              run: |
-                  git config user.name croisen-bot
-                  git config user.email andrewjames.git.gan@gmail.com
-                  git tag -a ${{ env.CURRENT_VER }} -m "Release ${{ env.CURRENT_VER }}"
-              env:
-                  GITHUB_TOKEN: ${{ github.token }}
-
-            - name: Push the Tag
-              run: git push --tags
-              env:
-                  GITHUB_TOKEN: ${{ github.token }}
+                      '${{ GITHUB_WORKSPACE }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf'
+                      '${{ GITHUB_WORKSPACE }}/chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe'
