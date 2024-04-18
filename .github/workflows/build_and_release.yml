@@ -25,23 +25,23 @@ jobs:
                   CURRENT_VER="$(./increment_version.sh)"
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
-              # Cross compiling to android seems like a pain?
             - name: Compile ChiyoTatsu [Release]
               run: |
                   export PATH=$PATH:/usr/local/go/bin
                   #export CGO_ENABLED=1
                   #GOOS=android GOARCH=amd64 go build -ldflags="-s -w" -o "and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
                   #GOOS=android GOARCH=386   go build -ldflags="-s -w" -o "and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf"  ./chiyotatsu.go
-                  GOOS=darwin  GOARCH=amd64 go build -ldflags="-s -w" -o "mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app" ./chiyotatsu.go
+                  #GOOS=darwin  GOARCH=amd64 go build -ldflags="-s -w" -o "mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app" ./chiyotatsu.go
                   #GOOS=darwin  GOARCH=386   go build -ldflags="-s -w" -o "mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app"  ./chiyotatsu.go
                   GOOS=linux   GOARCH=amd64 go build -ldflags="-s -w" -o "lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
                   GOOS=linux   GOARCH=386   go build -ldflags="-s -w" -o "lin-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf"  ./chiyotatsu.go
                   GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o "win-amd64-chiyotatsu-${{ env.CURRENT_VER }}.exe" ./chiyotatsu.go
                   GOOS=windows GOARCH=386   go build -ldflags="-s -w" -o "win-i386-chiyotatsu-${{ env.CURRENT_VER }}.exe"  ./chiyotatsu.go
 
-              # Why u not getting the binaries man?
-              # Please don't tell me it's because of the quotation marks...
-              # I was using the wrong action too!?
+              # and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
+              # and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
+              # mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app
+              # mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app
             - name: Create Release and Upload Assets
               uses: softprops/action-gh-release@v2
               with:
@@ -49,10 +49,6 @@ jobs:
                   body: ${{ github.event.head_commit.message }}
                   tag_name: ${{ env.CURRENT_VER }}
                   files: |
-                      and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
-                      and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
-                      mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app
-                      mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app
                       lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
                       lin-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
                       win-amd64-chiyotatsu-${{ env.CURRENT_VER }}.exe
