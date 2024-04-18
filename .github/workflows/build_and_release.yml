@@ -25,12 +25,10 @@ jobs:
                   CURRENT_VER="$(./increment_version.sh)"
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
-              # Gonna be using most of the cross compilation opts here bois
+              # Cross compiling to android seems like a pain?
             - name: Compile ChiyoTatsu [Release]
               run: |
                   export PATH=$PATH:/usr/local/go/bin
-                  GOOS=android GOARCH=amd64 go build -ldflags="-s -w" -o "and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
-                  GOOS=android GOARCH=386   go build -ldflags="-s -w" -o "and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf"  ./chiyotatsu.go
                   GOOS=darwin  GOARCH=amd64 go build -ldflags="-s -w" -o "mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app" ./chiyotatsu.go
                   GOOS=darwin  GOARCH=386   go build -ldflags="-s -w" -o "mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app"  ./chiyotatsu.go
                   GOOS=linux   GOARCH=amd64 go build -ldflags="-s -w" -o "lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
