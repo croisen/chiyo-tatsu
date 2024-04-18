@@ -25,14 +25,18 @@ jobs:
                   CURRENT_VER="$(./increment_version.sh)"
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
+              # Gonna be using most of the cross compilation opts here bois
             - name: Compile ChiyoTatsu [Release]
               run: |
                   export PATH=$PATH:/usr/local/go/bin
-                  go build -ldflags="-s -w" -o chiyotatsu.elf ./chiyotatsu.go
-                  GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o chiyotatsu.exe ./chiyotatsu.go
-                  mv -v chiyotatsu.elf "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf"
-                  mv -v chiyotatsu.exe "chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe"
-                  pwd
+                  GOOS=android GOARCH=amd64 go build -ldflags="-s -w" -o "and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
+                  GOOS=android GOARCH=386   go build -ldflags="-s -w" -o "and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf"  ./chiyotatsu.go
+                  GOOS=darwin  GOARCH=amd64 go build -ldflags="-s -w" -o "mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app" ./chiyotatsu.go
+                  GOOS=darwin  GOARCH=386   go build -ldflags="-s -w" -o "mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app"  ./chiyotatsu.go
+                  GOOS=linux   GOARCH=amd64 go build -ldflags="-s -w" -o "lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
+                  GOOS=linux   GOARCH=386   go build -ldflags="-s -w" -o "lin-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf"  ./chiyotatsu.go
+                  GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o "win-amd64-chiyotatsu-${{ env.CURRENT_VER }}.exe" ./chiyotatsu.go
+                  GOOS=windows GOARCH=386   go build -ldflags="-s -w" -o "win-i386-chiyotatsu-${{ env.CURRENT_VER }}.exe"  ./chiyotatsu.go
 
               # Why u not getting the binaries man?
               # Please don't tell me it's because of the quotation marks...
@@ -44,7 +48,13 @@ jobs:
                   body: ${{ github.event.head_commit.message }}
                   tag_name: ${{ env.CURRENT_VER }}
                   files: |
-                      chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.elf
-                      chiyotatsu-${{ env.CURRENT_VER }}-${{ github.sha }}.exe
+                      and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
+                      and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
+                      mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app
+                      mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app
+                      lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
+                      lin-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
+                      win-amd64-chiyotatsu-${{ env.CURRENT_VER }}.exe
+                      win-i386-chiyotatsu-${{ env.CURRENT_VER }}.exe
                   draft: false
                   prerelease: false
