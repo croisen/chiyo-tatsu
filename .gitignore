@@ -1,6 +1,6 @@
-eu.kanade.tachiyomi.debug_2024-01-22_05-54.tachibk
-kotatsu_26012024.bk.zip
-sample1.json
+*.tachibk
+*.bk.zip
+sample*.json
 
 valgrind_log
 

@@ -6,7 +6,9 @@ option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_catego
 message BackupCategory {
     string name = 1;
     int32 order = 2;
-    //int32 updateInterval = 3;
+
+    // Used in 1.x but not in 0.x
+    optional int32 updateInterval = 3;
 
     int32 flags = 100;
 }

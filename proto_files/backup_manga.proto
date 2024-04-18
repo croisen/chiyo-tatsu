@@ -34,12 +34,17 @@ message BackupManga {
   repeated int64 categories = 17;
   repeated tachiyomi_backup_tracking.BackupTracking tracking = 18;
 
-  bool favorite = 100;
-  int32 chapterFlags = 101;
+  // Another case of not being nullable but doesn't exist on my backup
+  optional bool favorite = 100;
+  optional int32 chapterFlags = 101;
   repeated tachiyomi_history.BrokenBackupHistory brokenHistory = 102;
+
   optional int32 viewer_flags = 103;
   repeated tachiyomi_history.BackupHistory history = 104;
+
+  // Another case of not being nullable but doesn't exist on my backup
   tachiyomi_manga_update_strategy.UpdateStrategy updateStrategy = 105;
+
   int64 lastModifiedAt = 106;
   optional int64 favoriteModifiedAt = 107;
 }

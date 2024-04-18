@@ -4,46 +4,33 @@ package tachiyomi_preference;
 option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_preference";
 
 message BackupPreference {
-    string key = 1;
-    PreferenceValue value = 2;
+  string key = 1;
+  oneof value {
+    int32 int_value = 2;
+    int64 long_value = 3;
+    float float_value = 4;
+    string string_value = 5;
+    bool bool_value = 6;
+    string_set string_set_value = 7;
+  }
 }
 
 message BackupSourcePreferences {
-    string source_key = 1;
-    repeated BackupPreference prefs = 2;
+  string source_key = 1;
+  repeated BackupPreference prefs = 2;
 }
 
-message PreferenceValue {
-    oneof value {
-        IntPreferenceValue int_value = 1;
-        LongPreferenceValue long_value = 2;
-        FloatPreferenceValue float_value = 3;
-        StringPreferenceValue string_value = 4;
-        BooleanPreferenceValue boolean_value = 5;
-        StringSetPreferenceValue string_set_value = 6;
-    }
+message string_set {
+    repeated string string_set = 1;
 }
 
-message IntPreferenceValue {
-    int32 value = 1;
-}
-
-message LongPreferenceValue {
-    int64 value = 1;
-}
-
-message FloatPreferenceValue {
-    float value = 1;
-}
-
-message StringPreferenceValue {
-    string value = 1;
-}
-
-message BooleanPreferenceValue {
-    bool value = 1;
-}
-
-message StringSetPreferenceValue {
-    repeated string value = 1;
+// For readability?
+enum PreferenceValue {
+  UNKNOWN = 0;
+  INT_VALUE = 2;
+  LONG_VALUE = 3;
+  FLOAT_VALUE = 4;
+  STRING_VALUE = 5;
+  BOOL_VALUE = 6;
+  STRING_SET_VALUE = 7;
 }

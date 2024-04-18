@@ -14,6 +14,7 @@ message Backup {
 
     repeated tachiyomi_source.BrokenBackupSource brokenSources = 100;
     repeated tachiyomi_source.BackupSource sources = 101;
+
     repeated tachiyomi_preference.BackupPreference preferences = 104;
     repeated tachiyomi_preference.BackupSourcePreferences sourcePreferences = 105;
 }

@@ -34,6 +34,7 @@ func TGunZip(input *os.File) *tachiyomi.Backup {
 	}
 	fmt.Println("Read", len(read), "Bytes from", input.Name())
 
+	protobuf_tachiyomi.Reset()
 	err = proto.Unmarshal(decompressed_buffer, &protobuf_tachiyomi)
 	if err != nil {
 		fmt.Println("Error parsing file", input.Name())
