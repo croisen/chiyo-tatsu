@@ -1,15 +1,13 @@
 include config.mk
 ELF				= chiyotatsu.elf
-
-UTILCO		= ${patsubst %.c,%.o,${UTILC}}
-UTILCPPO	= ${patsubst %.cpp,%.o,${UTILCPP}}
-PROTO_O		= ${patsubst %.cc,%.o,${PROTOCPP}}
+COMPILED_LIBS	= protobuf zlib
 
 default: clean elf_release
 
 clean:
 	-@rm -fv src/utils/*.o
 	-@rm -fv src/compiled_proto/*.o
+	-@rm -rfv other_libs/protobuf/build/
 
 elf_debug: ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	${CPP} ${CFLAGS} ${CPPSTD} ${DEBUG_FLAGS} -o ${ELF} ${MAIN}\

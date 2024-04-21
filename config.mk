@@ -18,3 +18,7 @@ MAIN			= src/chiyotatsu.cpp
 UTILC			= ${wildcard src/utils/*.c}
 UTILCPP			= ${wildcard src/utils/*.cpp}
 PROTOCPP		= ${wildcard src/compiled_proto/*.pb.cc}
+
+UTILCO			= ${patsubst %.c,%.o,${UTILC}}
+UTILCPPO		= ${patsubst %.cpp,%.o,${UTILCPP}}
+PROTO_O			= ${patsubst %.cc,%.o,${PROTOCPP}}
