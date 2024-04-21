@@ -15,7 +15,7 @@ A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 
 -   [protobuf](https://github.com/protocolbuffers/protobuf)
 -   [zlib](https://github.com/madler/zlib)
--   [tachiyomi_source_ids](https://gist.github.com/shashank-p/39b5d5ea9aeb523b7d3a97451d838f9d)
+-   [tachiyomi_source_ids](https://raw.githubusercontent.com/ThePBone/tachiyomi-extensions-revived/repo/index.min.json)
 
 ## Struggles
 

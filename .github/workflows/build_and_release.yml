@@ -25,7 +25,7 @@ jobs:
 
             - name: Compile
               run: |
-                  make elf_release
+                  make -j4 -f linux_ver.mk
                   mv chiyotatsu.elf chiyotatsu-i686-${{ env.CURRENT_VER }}.elf
 
             - name: Create Release and Upload Assets

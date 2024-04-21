@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <string>
 
 #include "utils/args.hpp"
 #include "utils/bread_parser.h"
@@ -7,6 +8,7 @@
 #include "utils/shutdown_hooks.hpp"
 
 #include "compiled_proto/tachiyomi.pb.h"
+#include "utils/tachiyomi_source_ids.hpp"
 
 int main(int argc, char **argv)
 {
@@ -28,13 +30,34 @@ int main(int argc, char **argv)
 
     Backup tachiyomiBackup;
     tachiyomiBackup.ParseFromArray(inputDecompressed.data(), size);
+    std::set<uint64_t> sourceIDs      = std::set<uint64_t>();
+    std::set<std::string> sourceNames = std::set<std::string>();
 
-    for (auto manga : tachiyomiBackup.mangabackup())
-        chiyotatsuFprintf(80, stdout, "Manga: %s\n", manga.title().c_str());
+    for (auto manga : tachiyomiBackup.mangabackup()) {
+        chiyotatsuFprintf(
+            80, stdout, "Source: %20" PRIu64 " Manga: %s\n", manga.source(),
+            manga.title().c_str()
+        );
+        sourceIDs.insert(manga.source());
+        if (tachiyomiSourceIDs.find(manga.source()) != tachiyomiSourceIDs.end())
+            sourceNames.insert(tachiyomiSourceIDs.at(manga.source()));
+        else
+            chiyotatsuLog(
+                CHWARN, "Source ID %" PRIu64 " not found!\n", manga.source()
+            );
+    }
 
     for (auto category : tachiyomiBackup.categories())
         chiyotatsuFprintf(
             80, stdout, "Category: %s\n", category.name().c_str()
+        );
+
+    auto it1 = sourceIDs.begin();
+    auto it2 = sourceNames.begin();
+    for (; it1 != sourceIDs.end() && it2 != sourceNames.end(); it1++, it2++)
+        chiyotatsuFprintf(
+            80, stdout, "Source ID: %20" PRIu64 " Name: %s\n", *it1,
+            (*it2).c_str()
         );
 
     shutdownChiyotatsu();
