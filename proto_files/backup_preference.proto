@@ -1,8 +1,5 @@
 syntax = "proto3";
 
-package tachiyomi_preference;
-option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_preference";
-
 message BackupPreference {
   string key = 1;
   oneof value {
@@ -11,17 +8,13 @@ message BackupPreference {
     float float_value = 4;
     string string_value = 5;
     bool bool_value = 6;
-    string_set string_set_value = 7;
+    string string_set_value = 7;
   }
 }
 
 message BackupSourcePreferences {
   string source_key = 1;
   repeated BackupPreference prefs = 2;
-}
-
-message string_set {
-    repeated string string_set = 1;
 }
 
 // For readability?

@@ -2,18 +2,6 @@
 *.bk.zip
 sample*.json
 
-valgrind_log
-
-*.a
-*.so
-
-*.lib
-*.exp
-*.dll
-*.pdb
-
-built_libs/remnants/*
-
-chiyotatsu.exe
-chiyotatsu.elf
 *.o
+*.exe
+*.elf

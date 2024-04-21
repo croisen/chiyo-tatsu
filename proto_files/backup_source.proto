@@ -1,8 +1,5 @@
 syntax = "proto3";
 
-package tachiyomi_source;
-option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_source";
-
 message BrokenBackupSource {
     string name = 1;
     int64 sourceId = 2;

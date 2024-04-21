@@ -1,8 +1,5 @@
 syntax = "proto3";
 
-package tachiyomi_manga_update_strategy;
-option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/manga_update_strategy";
-
 enum UpdateStrategy {
   ALWAYS_UPDATE = 0;
   ONLY_FETCH_ONCE = 1;

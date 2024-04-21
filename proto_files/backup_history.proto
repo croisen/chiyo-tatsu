@@ -1,8 +1,5 @@
 syntax = "proto3";
 
-package tachiyomi_history;
-option go_package = "github.com/croisen/chiyo-tatsu/proto_files_go/backup_history";
-
 message BrokenBackupHistory {
     string url = 1;
     int64 lastRead = 2;

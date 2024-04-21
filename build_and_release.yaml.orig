@@ -1,32 +1,32 @@
 name: Compile ChiyoTatsu
+
 on:
     push:
         branches:
             - main
 
 jobs:
-    ci-configure:
+    create_release:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout
+            - name: Checkout ChiyoTatsu
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
 
-            - name: Install compilers
+            - name: Install build essentials
               run: |
-                  sudo apt install -y zlib1g{,-dev} libz-mingw-w64{,-dev} \
-                  libprotobuf{32,-dev}
+                  sudo apt install -y zlib1g-dev zlib1g \
+                  libz-mingw-w64 libz-mingw-w64-dev \
+                  libprotobuf32 libprotobuf-dev
 
             - name: Generate Version Number
               run: |
                   CURRENT_VER="$(./increment_version.sh)"
                   echo "CURRENT_VER=$CURRENT_VER" >> $GITHUB_ENV
 
-            - name: Compile
+            - name: Compile ChiyoTatsu [Release]
               run: |
-                  make elf_release
-                  mv chiyotatsu.elf chiyotatsu-i686-${{ env.CURRENT_VER }}.elf
 
             - name: Create Release and Upload Assets
               uses: softprops/action-gh-release@v2
@@ -35,6 +35,9 @@ jobs:
                   body: ${{ github.event.head_commit.message }}
                   tag_name: ${{ env.CURRENT_VER }}
                   files: |
-                      chiyotatsu-i686-${{ env.CURRENT_VER }}.elf
+                      lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
+                      lin-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
+                      win-amd64-chiyotatsu-${{ env.CURRENT_VER }}.exe
+                      win-i386-chiyotatsu-${{ env.CURRENT_VER }}.exe
                   draft: false
                   prerelease: false
