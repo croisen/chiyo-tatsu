@@ -16,7 +16,7 @@ jobs:
             - name: Install compilers
               run: |
                   sudo apt install -y zlib1g{,-dev} libz-mingw-w64{,-dev} \
-                  libprotobuf{32,-dev}
+                  libprotobuf{23,-dev}
 
             - name: Generate Version Number
               run: |
