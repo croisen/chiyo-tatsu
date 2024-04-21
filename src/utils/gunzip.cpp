@@ -71,7 +71,7 @@ int64_t gunzip(std::string filename, std::vector<uint8_t> *buffer)
 
             switch (ret) {
             case Z_NEED_DICT:
-                ret = Z_DATA_ERROR; /* and fall through */
+                ret = Z_DATA_ERROR; /* fallthrough */
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 (void)inflateEnd(&strm);
