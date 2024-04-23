@@ -1,8 +1,11 @@
-#include <google/protobuf/service.h>
+#include "google/protobuf/stubs/common.h"
 
 #include "shutdown_hooks.hpp"
 
-void shutdownChiyotatsu(void)
+namespace chiyotatsu
+{
+void shutdown(void)
 {
     google::protobuf::ShutdownProtobufLibrary();
 }
+} // namespace chiyotatsu

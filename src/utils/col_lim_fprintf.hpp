@@ -1,15 +1,12 @@
 #ifndef __CHIYOTATSU_COLUMN_LIMITED_FPRINTF__
 #define __CHIYOTATSU_COLUMN_LIMITED_FPRINTF__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
+namespace chiyotatsu
+{
 #define CHINFO "[INFO]     "
 #define CHWARN "[WARN]     "
 #define CHFAIL "[ERROR]    " // This don't seem correct but I'mma go with it
@@ -66,8 +63,6 @@ extern "C" {
         exit(exitCode);                                                        \
     } while (false)
 
-#ifdef __cplusplus
-}
-#endif
+} // namespace chiyotatsu
 
 #endif // __CHIYOTATSU_COLUMN_LIMITED_FPRINTF__

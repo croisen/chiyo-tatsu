@@ -3,7 +3,7 @@
 
 #include "utils/args.hpp"
 #include "utils/bread_parser.h"
-#include "utils/col_lim_fprintf.h"
+#include "utils/col_lim_fprintf.hpp"
 #include "utils/gunzip.hpp"
 #include "utils/shutdown_hooks.hpp"
 
@@ -12,7 +12,7 @@
 
 int main(int argc, char **argv)
 {
-    defineArgs(argc, argv);
+    chiyotatsu::defineArgs(argc, argv);
     char *input = (char *)bParserGetArg('i', NULL, 0);
     if (input == NULL) {
         chiyotatsuLog(
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     chiyotatsuLog(CHINFO, "Input File: %s\n", input);
 
     std::vector<uint8_t> inputDecompressed = std::vector<uint8_t>();
-    int64_t size                           = gunzip(input, &inputDecompressed);
+    int64_t size = zlib::gunzip(input, &inputDecompressed);
     chiyotatsuLog(CHINFO, "Decompressed Size: %" PRId64 "\n", size);
 
     Backup tachiyomiBackup;
@@ -39,8 +39,9 @@ int main(int argc, char **argv)
             manga.title().c_str()
         );
         sourceIDs.insert(manga.source());
-        if (tachiyomiSourceIDs.find(manga.source()) != tachiyomiSourceIDs.end())
-            sourceNames.insert(tachiyomiSourceIDs.at(manga.source()));
+        if (tachiyomi::SourceIDs.find(manga.source()) !=
+            tachiyomi::SourceIDs.end())
+            sourceNames.insert(tachiyomi::SourceIDs.at(manga.source()));
         else
             chiyotatsuLog(
                 CHWARN, "Source ID %" PRIu64 " not found!\n", manga.source()
@@ -60,6 +61,6 @@ int main(int argc, char **argv)
             (*it2).c_str()
         );
 
-    shutdownChiyotatsu();
+    chiyotatsu::shutdown();
     return 0;
 }

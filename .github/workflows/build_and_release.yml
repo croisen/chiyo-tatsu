@@ -5,18 +5,19 @@ on:
             - main
 
 jobs:
-    ci-configure:
+    statically-compile-ubuntu:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
               with:
-                  fetch-depth: 0
+                  fetch-depth: 1
+                  fetch-tags: true
+                  submodules: recursive
 
             - name: Install compilers
               run: |
-                  sudo apt install -y zlib1g{,-dev} libz-mingw-w64{,-dev} \
-                  libprotobuf{23,-dev}
+                  sudo apt install -y cmake build-essential git bazel
 
             - name: Generate Version Number
               run: |
@@ -28,13 +29,24 @@ jobs:
                   make -j4 -f linux_ver.mk
                   mv chiyotatsu.elf chiyotatsu-i686-${{ env.CURRENT_VER }}.elf
 
-            - name: Create Release and Upload Assets
-              uses: softprops/action-gh-release@v2
-              with:
-                  name: 'Release ${{ env.CURRENT_VER }}'
-                  body: ${{ github.event.head_commit.message }}
-                  tag_name: ${{ env.CURRENT_VER }}
-                  files: |
-                      chiyotatsu-i686-${{ env.CURRENT_VER }}.elf
-                  draft: false
-                  prerelease: false
+    create-release:
+        - name: Download release binaries
+          uses: actions/download-artifact@v4
+          with:
+              name: |
+                  chiyotatsu-${{ env.CURRENT_VER }}-linux
+                  chiyotatsu-${{ env.CURRENT_VER }}-windows
+
+        - name: Create Release and Upload Assets
+          uses: softprops/action-gh-release@v2
+          with:
+              name: 'Release ${{ env.CURRENT_VER }}'
+              body: ${{ github.event.head_commit.message }}
+              tag_name: ${{ env.CURRENT_VER }}
+              files: |
+                  chiyotatsu-x86_32-${{ env.CURRENT_VER }}.elf
+                  chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf
+                  chiyotatsu-x86_32-${{ env.CURRENT_VER }}.exe
+                  chiyotatsu-x86_64-${{ env.CURRENT_VER }}.exe
+              draft: false
+              prerelease: false

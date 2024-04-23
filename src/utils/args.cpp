@@ -1,6 +1,8 @@
 #include "args.hpp"
 #include "bread_parser.h"
 
+namespace chiyotatsu
+{
 void defineArgs(int argc, char **argv)
 {
     bParserSetProgramName((char *)"chiyotatsu");
@@ -14,3 +16,4 @@ void defineArgs(int argc, char **argv)
 
     bParserParse(argc, argv);
 }
+} // namespace chiyotatsu

@@ -5,15 +5,17 @@
 #include <string>
 #include <vector>
 
-#include <zconf.h>
-#include <zlib.h>
+#include "zconf.h"
+#include "zlib.h"
 
-#include "col_lim_fprintf.h"
+#include "col_lim_fprintf.hpp"
 #include "gunzip.hpp"
 
 #define CHUNK      131072
 #define WINDOWBITS 16
 
+namespace zlib
+{
 int64_t gunzip(std::string filename, std::vector<uint8_t> *buffer)
 {
     buffer->clear();
@@ -94,3 +96,4 @@ int64_t gunzip(std::string filename, std::vector<uint8_t> *buffer)
 
     return decompressedSize;
 }
+} // namespace zlib

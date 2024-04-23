@@ -1,6 +1,9 @@
 #ifndef __CHIYOTATSU_SHUTDOWN_FUNCTION__
 #define __CHIYOTATSU_SHUTDOWN_FUNCTION__
 
-void shutdownChiyotatsu(void);
+namespace chiyotatsu
+{
+void shutdown(void);
+}
 
 #endif // __CHIYOTATSU_SHUTDOWN_FUNCTION__

@@ -5,6 +5,9 @@
 #include <map>
 #include <string>
 
-extern const std::map<uint64_t, std::string> tachiyomiSourceIDs;
+namespace tachiyomi
+{
+extern const std::map<uint64_t, std::string> SourceIDs;
+}
 
 #endif // __CHIYOTATSU_TACHIYOMI_SOURCE_IDS__

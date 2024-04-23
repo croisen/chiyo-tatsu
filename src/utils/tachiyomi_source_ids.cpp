@@ -4,7 +4,7 @@
 
 #include "tachiyomi_source_ids.hpp"
 
-const std::map<uint64_t, std::string> tachiyomiSourceIDs = {
+const std::map<uint64_t, std::string> tachiyomi::SourceIDs = {
     {10,                  "Wie Manga!"                                         },
     {100019686565354829,  "MangaScouts"                                        },
     {1005243067156766734, "MangaDods"                                          },

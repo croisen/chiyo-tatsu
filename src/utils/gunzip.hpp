@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+namespace zlib
+{
 int64_t gunzip(std::string fileName, std::vector<uint8_t> *buffer);
+}
 
 #endif // ___CHIYOTATSU_GUNZIP__

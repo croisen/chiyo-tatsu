@@ -3,5 +3,16 @@
 sample*.json
 
 *.o
+chiyotatsu
 *.exe
 *.elf
+
+protoc*
+
+*.so
+*.a
+*.dll
+*.dll.a
+
+libs/include/*
+libs/lib/*
