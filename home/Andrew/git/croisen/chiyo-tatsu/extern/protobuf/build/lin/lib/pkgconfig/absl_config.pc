@@ -1,0 +1,12 @@
+prefix=/home/Andrew/git/croisen/chiyo-tatsu/libs_lin
+exec_prefix=${prefix}
+libdir=/home/Andrew/git/croisen/chiyo-tatsu/libs_lin/lib
+includedir=/home/Andrew/git/croisen/chiyo-tatsu/libs_lin/include
+
+Name: absl_config
+Description: Abseil config library
+URL: https://abseil.io/
+Version: 20240116
+Requires:
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX

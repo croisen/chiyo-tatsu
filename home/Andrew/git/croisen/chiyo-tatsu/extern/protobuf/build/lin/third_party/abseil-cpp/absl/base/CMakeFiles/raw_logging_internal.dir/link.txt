@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,libabsl_raw_logging_internal.so.2401.0.0 -o libabsl_raw_logging_internal.so.2401.0.0 CMakeFiles/raw_logging_internal.dir/internal/raw_logging.cc.o  -Wl,-rpath,/home/Andrew/git/croisen/chiyo-tatsu/home/Andrew/git/croisen/chiyo-tatsu/extern/protobuf/build/lin/third_party/abseil-cpp/absl/base: libabsl_log_severity.so.2401.0.0

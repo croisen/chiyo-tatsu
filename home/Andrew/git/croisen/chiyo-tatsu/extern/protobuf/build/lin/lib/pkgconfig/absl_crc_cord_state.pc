@@ -1,0 +1,12 @@
+prefix=/home/Andrew/git/croisen/chiyo-tatsu/libs_lin
+exec_prefix=${prefix}
+libdir=/home/Andrew/git/croisen/chiyo-tatsu/libs_lin/lib
+includedir=/home/Andrew/git/croisen/chiyo-tatsu/libs_lin/include
+
+Name: absl_crc_cord_state
+Description: Abseil crc_cord_state library
+URL: https://abseil.io/
+Version: 20240116
+Requires: absl_crc32c = 20240116, absl_config = 20240116, absl_strings = 20240116
+Libs: -L${libdir}  -labsl_crc_cord_state 
+Cflags: -I${includedir} -DNOMINMAX

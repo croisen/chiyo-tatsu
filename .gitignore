@@ -14,5 +14,5 @@ protoc*
 *.dll
 *.dll.a
 
-libs/include/*
-libs/lib/*
+libs_lin/*
+libs_win/*
