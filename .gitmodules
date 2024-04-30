@@ -4,18 +4,9 @@
 [submodule "manga_src/tachiyomi"]
 	path = manga_src/tachiyomi
 	url = https://github.com/ZhanZiyuan/tachiyomi.git
-[submodule "other_libs/zlib"]
-	path = other_libs/zlib
-	url = https://github.com/madler/zlib.git
-[submodule "other_libs/protobuf"]
-	path = other_libs/protobuf
-	url = https://github.com/protocolbuffers/protobuf.git
 [submodule "extern/protobuf"]
 	path = extern/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
 [submodule "extern/zlib"]
 	path = extern/zlib
 	url = https://github.com/madler/zlib.git
-[submodule "extern/abseil-cpp"]
-	path = extern/abseil-cpp
-	url = https://github.com/abseil/abseil-cpp.git

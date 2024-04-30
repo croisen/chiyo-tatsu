@@ -2,29 +2,34 @@ PROJECT_ROOT	= ${strip ${dir ${realpath ${lastword ${MAKEFILE_LIST}}}}}
 
 CC				= gcc
 CPP				= g++
-
 CFLAGS			= -Wall -Wpedantic -Wextra
-RELEASE_FLAGS	= -O3 -g -Wl,--verbose
-DEBUG_FLAGS		= -O0 -g -Wl,--verbose
-
+RELEASE_FLAGS	= -O3 -g
+DEBUG_FLAGS		= -O0 -g
 CSTD			= --std=gnu11
 CPPSTD			= --std=gnu++2a
 
-MAIN			= ${PROJECT_ROOT}/src/chiyotatsu.cpp
-UTILC			= ${wildcard ${PROJECT_ROOT}/src/utils/*.c}
-UTILCPP			= ${wildcard ${PROJECT_ROOT}/src/utils/*.cpp}
-PROTO_FILES		= ${wildcard ${PROJECT_ROOT}/proto_files/*.proto}
-PROTOCPP		= ${patsubst ${PROJECT_ROOT}/proto_files/%.proto,${PROJECT_ROOT}/src/compiled_proto/%.pb.cc,${PROTO_FILES}}
+MAIN			= ${PROJECT_ROOT}src/chiyotatsu.cpp
+UTILC			= ${wildcard ${PROJECT_ROOT}src/utils/*.c}
+UTILCPP			= ${MAIN} ${wildcard ${PROJECT_ROOT}src/utils/*.cpp}
+PROTO_FILES		= ${wildcard ${PROJECT_ROOT}proto_files/*.proto}
+PROTOCPP		= ${patsubst ${PROJECT_ROOT}proto_files/%.proto,${PROJECT_ROOT}src/compiled_proto/%.pb.cc,${PROTO_FILES}}
 
 UTILCO			= ${patsubst %.c,%.o,${UTILC}}
 UTILCPPO		= ${patsubst %.cpp,%.o,${UTILCPP}}
 PROTO_O			= ${patsubst %.cc,%.o,${PROTOCPP}}
 
+LIBS_USED		= protobuf zlib
+# Define this if you wanna use mingw or something else?
+PREFIX			=
+
 ELF				= chiyotatsu.elf
 EXE				= chiyotatsu.exe
 
-# Define this if you wanna use mingw or something else?
-PREFIX			=
+WIN32			= ${PROJECT_ROOT}libs_win/32/lib/libz.dll.a ${PROJECT_ROOT}libs_win/32/lib/libprotobuf.dll.a
+WIN64			= ${PROJECT_ROOT}libs_win/64/lib/libz.dll.a ${PROJECT_ROOT}libs_win/64/lib/libprotobuf.dll.a
+LIN32			= ${PROJECT_ROOT}libs_lin/32/lib/libz.a ${PROJECT_ROOT}libs_lin/32/lib/libprotobuf.a
+LIN64			= ${PROJECT_ROOT}libs_lin/64/lib/libz.a ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.a\
+				  ${PROJECT_ROOT}libs_lin/64/lib/libz.so ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.so
 
 default:
 	@echo "It would be better if this was run with the 'clean' argument first"
@@ -36,255 +41,215 @@ default:
 	@echo "Project Root Dir: ${PROJECT_ROOT}"
 
 clean:
-	-@rm -f  ${PROJECT_ROOT}/src/utils/*.o
-	-@rm -f  ${PROJECT_ROOT}/src/compiled_proto/*.o
-	-@rm -f  ${PROJECT_ROOT}/src/compiled_proto/*.cc
-	-@rm -f  ${PROJECT_ROOT}/src/compiled_proto/*.pb.h
-	-@rm -fr ${PROJECT_ROOT}/libs_lin/lib/*
-	-@rm -fr ${PROJECT_ROOT}/libs_lin/include/*
-	-@rm -fr ${PROJECT_ROOT}/libs_win/lib/*
-	-@rm -fr ${PROJECT_ROOT}/libs_win/include/*
-	-@rm -fr ${PROJECT_ROOT}/extern/protobuf/build/win
-	-@rm -fr ${PROJECT_ROOT}/extern/protobuf/build/lin
-	@echo    "Removing ${PROJECT_ROOT}/src/utils/*.o"
-	@echo    "Removing ${PROJECT_ROOT}/src/compiled_proto/*.o"
-	@echo    "Removing ${PROJECT_ROOT}/src/compiled_proto/*.cc"
-	@echo    "Removing ${PROJECT_ROOT}/src/compiled_proto/*.pb.h"
-	@echo    "Removing ${PROJECT_ROOT}/libs_lin/lib/*"
-	@echo    "Removing ${PROJECT_ROOT}/libs_lin/include/*"
-	@echo    "Removing ${PROJECT_ROOT}/libs_win/lib/*"
-	@echo    "Removing ${PROJECT_ROOT}/libs_win/include/*"
-	@echo    "Removing ${PROJECT_ROOT}/extern/protobuf/build/win"
-	@echo    "Removing ${PROJECT_ROOT}/extern/protobuf/build/lin"
+	@echo    "Removing ${PROJECT_ROOT}src/utils/*.o"
+	-@rm -f  ${PROJECT_ROOT}src/utils/*.o
+	@echo    "Removing ${PROJECT_ROOT}src/compiled_proto/*.o"
+	-@rm -f  ${PROJECT_ROOT}src/compiled_proto/*.o
+	@echo    "Removing ${PROJECT_ROOT}src/compiled_proto/*.cc"
+	-@rm -f  ${PROJECT_ROOT}src/compiled_proto/*.cc
+	@echo    "Removing ${PROJECT_ROOT}src/compiled_proto/*.pb.h"
+	-@rm -f  ${PROJECT_ROOT}src/compiled_proto/*.pb.h
 
-elf_debug: ${PROJECT_ROOT}/libs_lin/lib/libz.so\
-	${PROJECT_ROOT}/libs_lin/lib/libprotobuf.so\
-	${UTILCO} ${UTILCPPO} ${PROTOCPP} ${PROTO_O}
-	@if [ ! -e ${ELF} ]; then\
-		echo "Linking ${ELF}";\
-		${CPP} -v ${CFLAGS} ${CPPSTD} ${DEBUG_FLAGS}\
-			-o ${ELF} ${MAIN}\
-			${UTILCO}\
-			${UTILCPPO}\
-			${PROTO_O}\
-			$$(\
-				PKG_CONFIG_PATH=${PROJECT_ROOT}/libs_lin/lib/pkgconfig\
-					pkg-config --cflags --libs protobuf zlib\
-			);\
-	fi
-	@echo "Linked target ${ELF}"
+elf_debug: ${LIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
+	@echo "Linking ${ELF}"
+	@${CPP} ${CFLAGS}\
+		${INCL}\
+		${CPPSTD} ${DEBUG_FLAGS}\
+		-o ${ELF}\
+		${UTILCO}\
+		${UTILCPPO}\
+		${PROTO_O}\
+		${LIBS}
 
-elf_release: ${PROJECT_ROOT}/libs_lin/lib/libz.a\
-	${PROJECT_ROOT}/libs_lin/lib/libprotobuf.a\
-	${UTILCO} ${UTILCPPO} ${PROTOCPP} ${PROTO_O}
-	@if [ ! -e ${ELF} ]; then\
-		echo "Linking ${ELF}";\
-		${CPP} -v ${CFLAGS} ${CPPSTD} ${RELEASE_FLAGS} --static\
-			-o ${ELF} ${MAIN}\
-			${UTILCO}\
-			${UTILCPPO}\
-			${PROTO_O}\
-			$$(\
-				PKG_CONFIG_PATH=${PROJECT_ROOT}/libs_lin/lib/pkgconfig\
-					pkg-config --cflags --libs protobuf zlib\
-			);\
-		strip ${ELF};\
-	fi
-	@echo "Linked target ${ELF}"
+elf_release_32: ${LIN32} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
+	@echo "Linking ${ELF}"
+	@${CPP} ${CFLAGS}\
+		${INCL}\
+		${CPPSTD} ${RELEASE_FLAGS}\
+		--static -m32\
+		-o ${ELF}\
+		${UTILCO}\
+		${UTILCPPO}\
+		${PROTO_O}\
+		${LIBS}
+	@strip ${ELF}
 
-exe_release: ${PROJECT_ROOT}/libs_win/lib/libz.dll.a\
-	${PROJECT_ROOT}/libs_win/lib/libprotobuf.dll.a\
-	${UTILCO} ${UTILCPPO} ${PROTOCPP} ${PROTO_O}
-	@if [ ! -e ${EXE} ]; then\
-		echo "Linking ${EXE}";\
-		${PREFIX}${CPP} ${CFLAGS} ${CPPSTD} ${RELEASE_FLAGS} --static\
-			-o ${EXE} ${MAIN}\
-			${UTILCO}\
-			${UTILCPPO}\
-			${PROTO_O}\
-			$$(\
-				PKG_CONFIG_PATH=${PROJECT_ROOT}/libs_lin/lib/pkgconfig\
-					${PREFIX}pkg-config --cflags --libs protobuf zlib\
-			);\
-	fi
-	@echo "Linked target ${EXE}"
+elf_release_64: ${LIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
+	@echo "Linking ${ELF}"
+	@${CPP} ${CFLAGS}\
+		${INCL}\
+		${CPPSTD} ${RELEASE_FLAGS}\
+		--static -m64\
+		-o ${ELF}\
+		${UTILCO}\
+		${UTILCPPO}\
+		${PROTO_O}\
+		${LIBS}
+	@strip ${ELF}
+
+exe_release_32: ${WIN32} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
+	@echo "Linking ${EXE}"
+	@${PREFIX}${CPP} ${CFLAGS}\
+		${INCL}\
+		${CPPSTD} ${RELEASE_FLAGS}\
+		--static -m32\
+		-o ${EXE}\
+		${UTILCO}\
+		${UTILCPPO}\
+		${PROTO_O}\
+		${LIBS}
+
+exe_release_64: ${WIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
+	@echo "Linking ${EXE}"
+	@${PREFIX}${CPP} ${CFLAGS}\
+		${INCL}\
+		${CPPSTD} ${RELEASE_FLAGS}\
+		--static -m64\
+		-o ${EXE}\
+		${UTILCO}\
+		${UTILCPPO}\
+		${PROTO_O}\
+		${LIBS}
 
 %.o: %.c
-	@if [ ! -e $@ ]; then\
-		echo "Building C object ${@}";\
-		${PREFIX}${CC} ${CFLAGS} ${CSTD} ${RELEASE_FLAGS}\
-			-o $@\
-			-c $<\
-			$$(\
-				PKG_CONFIG_PATH=${PROJECT_ROOT}/libs_lin/lib/pkgconfig\
-					pkg-config --cflags protobuf zlib\
-			);\
-	fi
-	@echo "Built target ${@}"
+	@echo "Building C object ${@}"
+	@${PREFIX}${CC} ${CFLAGS}\
+		${INCL}\
+		${CSTD} ${RELEASE_FLAGS}\
+		-o $@\
+		-c $<
 
 %.o: %.cpp
-	@if [ ! -e $@ ]; then\
-		echo "Building CXX object ${@}";\
-		${PREFIX}${CPP} ${CFLAGS} ${CPPSTD} ${RELEASE_FLAGS}\
-			-o $@\
-			-c $<\
-			$$(\
-				PKG_CONFIG_PATH=${PROJECT_ROOT}/libs_lin/lib/pkgconfig\
-					pkg-config --cflags protobuf zlib\
-			);\
-	fi
-	@echo "Built target ${@}"
+	@echo "Building CXX object ${@}"
+	@${PREFIX}${CPP} ${CFLAGS}\
+		${INCL}\
+		${CPPSTD} ${RELEASE_FLAGS}\
+		-o $@\
+		-c $<
 
 %.o: %.cc
-	@if [ ! -e $@ ]; then\
-		echo "Building CXX object ${@}";\
-		${PREFIX}${CPP} ${CFLAGS} ${CPPSTD} ${RELEASE_FLAGS}\
-			-o $@\
-			-c $<\
-			$$(\
-				PKG_CONFIG_PATH=${PROJECT_ROOT}/libs_lin/lib/pkgconfig\
-					pkg-config --cflags protobuf zlib\
-			);\
-	fi
-	@echo "Built target ${@}"
+	@echo "Building CXX object ${@}"
+	@${PREFIX}${CPP} ${CFLAGS}\
+		${INCL}\
+		${CPPSTD} ${RELEASE_FLAGS}\
+		-o $@\
+		-c $<
 
-${PROJECT_ROOT}/src/compiled_proto/%.pb.cc: ${PROJECT_ROOT}/proto_files/%.proto
-	@if [ -e ${PROJECT_ROOT}/libs_lin/bin/protoc ]; then\
-		${PROJECT_ROOT}/libs_lin/bin/protoc -I$$(pwd)/proto_files\
-			--cpp_out=${PROJECT_ROOT}/src/compiled_proto\
-			${notdir $<};\
-	elif [ -e ${PROJECT_ROOT}/libs_win/bin/protoc.exe ]; then\
-		${PROJECT_ROOT}/libs_win/bin/protoc.exe -I$$(pwd)/proto_files\
-			--cpp_out=${PROJECT_ROOT}/src/compiled_proto\
+${PROJECT_ROOT}src/compiled_proto/%.pb.cc: ${PROJECT_ROOT}proto_files/%.proto
+	@if command -v protoc > /dev/null; then\
+		echo "Building from proto file ${@}";\
+		protoc -I$$(pwd)/proto_files\
+			--cpp_out=${PROJECT_ROOT}src/compiled_proto\
 			${notdir $<};\
 	fi
 
-${PROJECT_ROOT}/libs_lin/lib/libz.a:
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin;\
+${PROJECT_ROOT}libs_lin/32/lib/libz.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/32/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/lib;\
 	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/lib;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/include;\
-	fi
-	cd ${PROJECT_ROOT}/extern/zlib/; ./configure\
-		--prefix=${PROJECT_ROOT}/libs_lin
-	${MAKE} -C ${PROJECT_ROOT}/extern/zlib -j4 install
+	cd ${PROJECT_ROOT}extern/zlib/; ./configure\
+		--prefix=${PROJECT_ROOT}libs_lin/32
+	${MAKE} -C ${PROJECT_ROOT}extern/zlib -j4 install
 
-${PROJECT_ROOT}/libs_lin/lib/libabsl_base.a:
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin;\
+${PROJECT_ROOT}libs_lin/32/lib/libprotobuf.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/32/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/lib;\
 	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/lib;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/include;\
-	fi
-	cmake -B ./extern/abseil-cpp/build/lin\
-		-DCMAKE_INSTALL_PREFIX=libs_lin/\
-		./extern/abseil-cpp/
-	${MAKE} -C ./extern/abseil-cpp/build/lin -j4 install
-
-${PROJECT_ROOT}/libs_lin/lib/libprotobuf.a:
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/lib;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/include;\
-	fi
-	cmake -B ${PROJECT_ROOT}/extern/protobuf/build/lin\
-		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}/libs_lin/\
+	cmake -B ${PROJECT_ROOT}extern/protobuf/build/lin32\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/32\
 		-Dprotobuf_ABSL_PROVIDER='module'\
 		-Dprotobuf_USE_EXTERNAL_GTEST=OFF\
-		${PROJECT_ROOT}/extern/protobuf/
-	make -C ${PROJECT_ROOT}/extern/protobuf/build/lin -j4 install
+		${PROJECT_ROOT}extern/protobuf/
+	make -C ${PROJECT_ROOT}extern/protobuf/build/lin32 -j4 install
 
-${PROJECT_ROOT}/libs_lin/lib/libz.so:
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin;\
+${PROJECT_ROOT}libs_lin/64/lib/libz.a:
+	cd ${PROJECT_ROOT}extern/zlib/; ./configure\
+		--prefix=${PROJECT_ROOT}libs_lin/64
+	${MAKE} -C ${PROJECT_ROOT}extern/zlib -j4 install
+
+${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/64/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/lib;\
 	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/lib;\
+	cmake -B ${PROJECT_ROOT}extern/protobuf/build/lin64\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
+		-Dprotobuf_ABSL_PROVIDER='module'\
+		-Dprotobuf_USE_EXTERNAL_GTEST=OFF\
+		${PROJECT_ROOT}extern/protobuf/
+	make -C ${PROJECT_ROOT}extern/protobuf/build/lin64 -j4 install
+
+${PROJECT_ROOT}libs_lin/64/lib/libz.so:
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/64/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/lib;\
 	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/include;\
-	fi
-	cd ${PROJECT_ROOT}/extern/zlib/; ./configure \
-		--prefix=${PROJECT_ROOT}/libs_lin\
+	cd ${PROJECT_ROOT}extern/zlib/; ./configure \
+		--prefix=${PROJECT_ROOT}libs_lin/64\
 		--enable-shared
 	make -C ./extern/zlib -j4 install
 
-${PROJECT_ROOT}/libs_lin/lib/libprotobuf.so:
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin;\
+${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.so:
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/64/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/lib;\
 	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/lib;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_lin/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_lin/include;\
-	fi
-	cmake -B ./${PROJECT_ROOT}/extern/protobuf/build/lin\
-		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}/libs_lin/\
+	cmake -B ./${PROJECT_ROOT}extern/protobuf/build/lin64\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
 		-Dprotobuf_ABSL_PROVIDER='module'\
 		-Dprotobuf_BUILD_SHARED_LIBS=ON\
 		-Dprotobuf_USE_EXTERNAL_GTEST=OFF\
-		${PROJECT_ROOT}/extern/protobuf/
-	make -C ${PROJECT_ROOT}/extern/protobuf/build/lin -j4 install
+		${PROJECT_ROOT}extern/protobuf/
+	make -C ${PROJECT_ROOT}extern/protobuf/build/lin64 -j4 install
 
-${PROJECT_ROOT}/libs_win/lib/libz.dll.a:
-	@if [ ! -d ${PROJECT_ROOT}/libs_win ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win;\
+${PROJECT_ROOT}libs_win/32/lib/libz.dll.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_win/32/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_win/32/include;\
+		mkdir -p ${PROJECT_ROOT}libs_win/32/lib;\
 	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_win/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win/lib;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_win/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win/include;\
-	fi
-	cd ${PROJECT_ROOT}/extern/zlib/; ./configure\
-		--prefix=${PROJECT_ROOT}/libs_win
-	make -C ./${PROJECT_ROOT}/extern/zlib\
+	cd ${PROJECT_ROOT}extern/zlib/; ./configure\
+		--prefix=${PROJECT_ROOT}libs_win/32
+	make -C ./${PROJECT_ROOT}extern/zlib\
 		-fwin32/Makefile.gcc -j4\
 		PREFIX=${PREFIX} install
 
-${PROJECT_ROOT}libs_win/lib/libabsl_base.dll:
-	@if [ ! -d ${PROJECT_ROOT}/libs_win ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win;\
+${PROJECT_ROOT}libs_win/32/lib/libprotobuf.dll.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_win/32/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_win/32/include;\
+		mkdir -p ${PROJECT_ROOT}libs_win/32/lib;\
 	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_win/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win/lib;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_win/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win/include;\
-	fi
-	${PREFIX}cmake -B ${PROJECT_ROOT}/extern/abseil-cpp/build/win\
-		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}/libs_lin/\
-		${PROJECT_ROOT}/extern/abseil-cpp/
-	make -C ./extern/abseil-cpp/build/win -j4 install
-
-${PROJECT_ROOT}/libs_win/lib/libprotobuf.dll.a:
-	@if [ ! -d ${PROJECT_ROOT}/libs_win ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_win/lib ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win/lib;\
-	fi
-	@if [ ! -d ${PROJECT_ROOT}/libs_win/include ]; then\
-		mkdir ${PROJECT_ROOT}/libs_win/include;\
-	fi
-	${PREFIX}cmake -B ${PROJECT_ROOT}/extern/protobuf/build/win \
-		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}/libs_win/\
+	${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win32\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_win/\
 		-Dprotobuf_ABSL_PROVIDER='module'\
 		-Dprotobuf_USE_EXTERNAL_GTEST=OFF\
-		${PROJECT_ROOT}/extern/protobuf/
-	make -C ${PROJECT_ROOT}/extern/protobuf/build/win \
+		${PROJECT_ROOT}extern/protobuf/
+	make -C ${PROJECT_ROOT}extern/protobuf/build/win32\
+		-j4 install
+
+${PROJECT_ROOT}libs_win/64/lib/libz.dll.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_win/64/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_win/64/include;\
+		mkdir -p ${PROJECT_ROOT}libs_win/64/lib;\
+	fi
+	cd ${PROJECT_ROOT}extern/zlib/; ./configure\
+		--prefix=${PROJECT_ROOT}libs_win/64
+	make -C ./${PROJECT_ROOT}extern/zlib\
+		-fwin32/Makefile.gcc -j4\
+		PREFIX=${PREFIX} install
+
+${PROJECT_ROOT}libs_win/64/lib/libprotobuf.dll.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_win/64/include]; then\
+		mkdir -p ${PROJECT_ROOT}libs_win/64/include;\
+		mkdir -p ${PROJECT_ROOT}libs_win/64/lib;\
+	fi
+	${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win64\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_win/\
+		-Dprotobuf_ABSL_PROVIDER='module'\
+		-Dprotobuf_USE_EXTERNAL_GTEST=OFF\
+		${PROJECT_ROOT}extern/protobuf/
+	make -C ${PROJECT_ROOT}extern/protobuf/build/win64\
 		-j4 install
 
 .PHONY: default clean elf_debug elf_release exe_release

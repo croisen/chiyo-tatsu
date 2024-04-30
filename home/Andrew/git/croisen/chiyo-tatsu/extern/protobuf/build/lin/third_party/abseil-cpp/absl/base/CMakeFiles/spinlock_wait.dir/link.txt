@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -shared -Wl,-soname,libabsl_spinlock_wait.so.2401.0.0 -o libabsl_spinlock_wait.so.2401.0.0 CMakeFiles/spinlock_wait.dir/internal/spinlock_wait.cc.o

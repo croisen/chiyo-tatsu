@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -shared -Wl,-soname,libabsl_log_internal_nullguard.so.2401.0.0 -o libabsl_log_internal_nullguard.so.2401.0.0 CMakeFiles/log_internal_nullguard.dir/internal/nullguard.cc.o

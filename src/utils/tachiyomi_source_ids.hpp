@@ -7,7 +7,7 @@
 
 namespace tachiyomi
 {
-extern const std::map<uint64_t, std::string> SourceIDs;
+extern const std::map<int64_t, std::string> SourceIDs;
 }
 
 #endif // __CHIYOTATSU_TACHIYOMI_SOURCE_IDS__
