@@ -1,0 +1,35 @@
+0000000000001680 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalD1Ev>:
+1684: e8 00 00 00 00      call 1689 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalD1Ev+0x9>
+1689: e8 00 00 00 00      call 168e <_ZN4absl12lts_2024011612log_internal15LogMessageFatalD1Ev+0xe>
+
+0000000000000254 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKci>:
+00000000000002be <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE>:
+2d0: e8 00 00 00 00       call 2d5 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x17>
+2da: 48 8d 15 00 00 00 00 lea 0x0(%rip),%rdx # 2e1 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x23>
+2e4: e8 00 00 00 00       call 2e9 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x2b>
+2f2: e8 00 00 00 00       call 2f7 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x39>
+2fc: 48 8d 15 00 00 00 00 lea 0x0(%rip),%rdx 
+303 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x45>
+306: e8 00 00 00 00       call 30b <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x4d>
+316: e8 00 00 00 00       call 31b <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x5d>
+31e: e8 00 00 00 00       call 323 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x65>
+
+2e2: e8 00 00 00 00       call 2e7 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x29>
+2e2: e8 00 00 00 00       call 2e7 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x29>
+2e2: e8 00 00 00 00       call 2e7 <_ZN4absl12lts_2024011612log_internal15LogMessageFatalC1EPKciSt17basic_string_viewIcSt11char_traitsIcEE+0x29>
+
+repeated_ptr_field.h in protobuf src 643 - 647
+(It's looking for what overload now?)
+```
+Rep* rep() {
+    ABSL_DCHECK(!using_sso());
+    return reinterpret_cast<Rep*>(
+        reinterpret_cast<uintptr_t>(tagged_rep_or_elem_) - 1);
+}
+```
+
+Linking chiyotatsu64.elf
+/usr/bin/ld: chiyo-tatsu/src/chiyotatsu.o: in function `google::protobuf::internal::RepeatedPtrFieldBase::rep()':
+chiyo-tatsu/libs_lin/64/include/google/protobuf/repeated_ptr_field.h:744:(.text.unlikely+0x37): undefined reference to `absl::lts_20240116::log_internal::LogMessageFatal::LogMessageFatal(char const*, int, absl::lts_20240116::string_view)'
+collect2: error: ld returned 1 exit status
+make: *** [linux64.mk:117: elf_release] Error 1

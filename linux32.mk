@@ -1,5 +1,7 @@
 PROJECT_ROOT	= ${strip ${dir ${realpath ${lastword ${MAKEFILE_LIST}}}}}
 
+# This don't work when compiling from an x86_64 machine?
+
 CC				= gcc
 CXX				= g++
 #-Wall -Wpedantic -Wextra

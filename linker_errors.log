@@ -1,4 +1,0 @@
-/usr/bin/ld: /home/Andrew/git/croisen/chiyo-tatsu/src/chiyotatsu.o: in function `google::protobuf::internal::RepeatedPtrFieldBase::rep()':
-/home/Andrew/git/croisen/chiyo-tatsu/libs_lin/64/include/google/protobuf/repeated_ptr_field.h:744:(.text.unlikely+0x37): undefined reference to `absl::lts_20240116::log_internal::LogMessageFatal::LogMessageFatal(char const*, int, absl::lts_20240116::string_view)'
-collect2: error: ld returned 1 exit status
-make: *** [linux_ver.mk:137: elf_release_64] Error 1
