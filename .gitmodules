@@ -11,4 +11,7 @@
 [submodule "extern/zlib"]
 	path = extern/zlib
 	url = https://github.com/madler/zlib.git
-	branch = develop
+[submodule "extern/abseil-cpp"]
+	path = extern/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
+	branch = lts_2024_01_16

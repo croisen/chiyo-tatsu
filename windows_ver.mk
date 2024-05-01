@@ -64,6 +64,7 @@ exe_release_32: ${WIN32} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_win/32/lib/pkgconfig\
 			pkg-config --cflags --libs ${LIBS_USED}\
 		)
+	@echo "Built target ${@}"
 
 exe_release_64: ${WIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@echo "Linking ${EXE}"
@@ -78,6 +79,7 @@ exe_release_64: ${WIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_win/64/lib/pkgconfig\
 			pkg-config --cflags --libs ${LIBS_USED}\
 		)
+	@echo "Built target ${@}"
 
 %.o: %.c
 	@echo "Building C object ${@}"
@@ -89,6 +91,7 @@ exe_release_64: ${WIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_win/64/lib/pkgconfig\
 			pkg-config --cflags ${LIBS_USED}\
 		)
+	@echo "Built target ${@}"
 
 %.o: %.cpp
 	@echo "Building CXX object ${@}"
@@ -101,6 +104,7 @@ exe_release_64: ${WIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_win/64/lib/pkgconfig\
 			pkg-config --cflags ${LIBS_USED}\
 		)
+	@echo "Built target ${@}"
 
 %.o: %.cc
 	@echo "Building CXX object ${@}"
@@ -113,6 +117,7 @@ exe_release_64: ${WIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_win/32/lib/pkgconfig\
 			pkg-config --cflags ${LIBS_USED}\
 		)
+	@echo "Built target ${@}"
 
 ${PROJECT_ROOT}src/compiled_proto/%.pb.cc: ${PROJECT_ROOT}proto_files/%.proto
 	@if [ -e ${PROJECT_ROOT}libs_lin/64/bin/protoc ]; then\
@@ -135,6 +140,8 @@ ${PROJECT_ROOT}src/compiled_proto/%.pb.cc: ${PROJECT_ROOT}proto_files/%.proto
 		${PROJECT_ROOT}libs_win/64/bin/protoc.exe -I${PROJECT_ROOT}proto_files\
 			--cpp_out=${PROJECT_ROOT}src/compiled_proto\
 			${notdir $<};\
+	else\
+		echo "Build failed for target ${@}";\
 	fi
 
 ${PROJECT_ROOT}libs_win/32/lib/libz.dll.a:
@@ -142,18 +149,19 @@ ${PROJECT_ROOT}libs_win/32/lib/libz.dll.a:
 		mkdir -p ${PROJECT_ROOT}libs_win/32/include;\
 		mkdir -p ${PROJECT_ROOT}libs_win/32/lib;\
 	fi
-	cd ${PROJECT_ROOT}extern/zlib/; CFLAGS=-m32 ./configure\
+	@cd ${PROJECT_ROOT}extern/zlib/; CFLAGS=-m32 ./configure\
 		--prefix=${PROJECT_ROOT}libs_win/32
-	make -C ${PROJECT_ROOT}extern/zlib\
+	@make -C ${PROJECT_ROOT}extern/zlib\
 		-fwin32/Makefile.gcc -j4\
 		PREFIX=${PREFIX} install
+	@echo "Built target ${@}"
 
 ${PROJECT_ROOT}libs_win/32/lib/libprotobuf.dll.a:
 	@if [ ! -d ${PROJECT_ROOT}libs_win/32/include ]; then\
 		mkdir -p ${PROJECT_ROOT}libs_win/32/include;\
 		mkdir -p ${PROJECT_ROOT}libs_win/32/lib;\
 	fi
-	${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win32\
+	@${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win32\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_win/32\
 		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_win/32\
 		-DCMAKE_BUILD_TYPE=Release\
@@ -163,26 +171,28 @@ ${PROJECT_ROOT}libs_win/32/lib/libprotobuf.dll.a:
 		-Dprotobuf_BUILD_TESTS=OFF\
 		-DABSL_PROPAGATE_CXX_STD=ON\
 		${PROJECT_ROOT}extern/protobuf/
-	make -C ${PROJECT_ROOT}extern/protobuf/build/win32\
+	@make -C ${PROJECT_ROOT}extern/protobuf/build/win32\
 		-j4 install
+	@echo "Built target ${@}"
 
 ${PROJECT_ROOT}libs_win/64/lib/libz.dll.a:
 	@if [ ! -d ${PROJECT_ROOT}libs_win/64/include ]; then\
 		mkdir -p ${PROJECT_ROOT}libs_win/64/include;\
 		mkdir -p ${PROJECT_ROOT}libs_win/64/lib;\
 	fi
-	cd ${PROJECT_ROOT}extern/zlib/; ./configure\
+	@cd ${PROJECT_ROOT}extern/zlib/; ./configure\
 		--prefix=${PROJECT_ROOT}libs_win/64
-	make -C ${PROJECT_ROOT}extern/zlib\
+	@make -C ${PROJECT_ROOT}extern/zlib\
 		-fwin32/Makefile.gcc -j4\
 		PREFIX=${PREFIX} install
+	@echo "Built target ${@}"
 
 ${PROJECT_ROOT}libs_win/64/lib/libprotobuf.dll.a:
 	@if [ ! -d ${PROJECT_ROOT}libs_win/64/include ]; then\
 		mkdir -p ${PROJECT_ROOT}libs_win/64/include;\
 		mkdir -p ${PROJECT_ROOT}libs_win/64/lib;\
 	fi
-	${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win64\
+	@${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win64\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_win/64\
 		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_win/64\
 		-DCMAKE_BUILD_TYPE=Release\
@@ -191,7 +201,8 @@ ${PROJECT_ROOT}libs_win/64/lib/libprotobuf.dll.a:
 		-Dprotobuf_BUILD_TESTS=OFF\
 		-DABSL_PROPAGATE_CXX_STD=ON\
 		${PROJECT_ROOT}extern/protobuf/
-	make -C ${PROJECT_ROOT}extern/protobuf/build/win64\
+	@make -C ${PROJECT_ROOT}extern/protobuf/build/win64\
 		-j4 install
+	@echo "Built target ${@}"
 
 .PHONY: default clean exe_release
