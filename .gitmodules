@@ -7,7 +7,7 @@
 [submodule "extern/protobuf"]
 	path = extern/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
-	branch = 25.x
+	branch = 27.x
 [submodule "extern/zlib"]
 	path = extern/zlib
 	url = https://github.com/madler/zlib.git

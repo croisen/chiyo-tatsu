@@ -44,8 +44,12 @@ clean:
 	-@rm -f  ${PROJECT_ROOT}src/compiled_proto/*.pb.h
 	@echo    "Removing ${PROJECT_ROOT}libs_win/32/lib/*"
 	-@rm -fr ${PROJECT_ROOT}libs_win/32/lib/*
+	@echo    "Removing ${PROJECT_ROOT}libs_win/32/bin/*"
+	-@rm -fr ${PROJECT_ROOT}libs_win/32/bin/*
 	@echo    "Removing ${PROJECT_ROOT}libs_win/64/lib/*"
 	-@rm -fr ${PROJECT_ROOT}libs_win/64/lib/*
+	@echo    "Removing ${PROJECT_ROOT}libs_win/64/bin/*"
+	-@rm -fr ${PROJECT_ROOT}libs_win/64/bin/*
 
 exe_release_32: ${WIN32} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@echo "Linking ${EXE}"
@@ -138,7 +142,7 @@ ${PROJECT_ROOT}libs_win/32/lib/libz.dll.a:
 		mkdir -p ${PROJECT_ROOT}libs_win/32/include;\
 		mkdir -p ${PROJECT_ROOT}libs_win/32/lib;\
 	fi
-	cd ${PROJECT_ROOT}extern/zlib/; ./configure\
+	cd ${PROJECT_ROOT}extern/zlib/; CFLAGS=-m32 ./configure\
 		--prefix=${PROJECT_ROOT}libs_win/32
 	make -C ${PROJECT_ROOT}extern/zlib\
 		-fwin32/Makefile.gcc -j4\
@@ -151,10 +155,13 @@ ${PROJECT_ROOT}libs_win/32/lib/libprotobuf.dll.a:
 	fi
 	${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win32\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_win/32\
+		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_win/32\
 		-DCMAKE_BUILD_TYPE=Release\
-		-DCMAKE_CXX_STANDARD=14\
+		-DCMAKE_CXX_FLAGS="-m32"\
+		-DCMAKE_CXX_STANDARD=20\
 		-Dprotobuf_ABSL_PROVIDER='module'\
 		-Dprotobuf_BUILD_TESTS=OFF\
+		-DABSL_PROPAGATE_CXX_STD=ON\
 		${PROJECT_ROOT}extern/protobuf/
 	make -C ${PROJECT_ROOT}extern/protobuf/build/win32\
 		-j4 install
@@ -177,10 +184,12 @@ ${PROJECT_ROOT}libs_win/64/lib/libprotobuf.dll.a:
 	fi
 	${PREFIX}cmake -B ${PROJECT_ROOT}extern/protobuf/build/win64\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_win/64\
+		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_win/64\
 		-DCMAKE_BUILD_TYPE=Release\
-		-DCMAKE_CXX_STANDARD=14\
+		-DCMAKE_CXX_STANDARD=20\
 		-Dprotobuf_ABSL_PROVIDER='module'\
 		-Dprotobuf_BUILD_TESTS=OFF\
+		-DABSL_PROPAGATE_CXX_STD=ON\
 		${PROJECT_ROOT}extern/protobuf/
 	make -C ${PROJECT_ROOT}extern/protobuf/build/win64\
 		-j4 install
