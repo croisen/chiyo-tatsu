@@ -96,7 +96,7 @@ clean:
 	-@rm -f  ${PROJECT_ROOT}src/compiled_proto/*.pb.h
 
 elf_debug: ${LIN64DYN} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
-	@echo "Linking ${ELF}"
+	@echo "Linking executable ${ELF}"
 	@${CXX} ${CFLAGS} ${CXXSTD}\
 		$$(\
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_lin/64/lib/pkgconfig\
@@ -113,13 +113,14 @@ elf_debug: ${LIN64DYN} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@echo "Built target ${ELF}"
 
 elf_release: ${LIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
-	@echo "Linking ${ELF}"
+	@echo "Linking executable ${ELF}"
 	@${CXX} ${CFLAGS} ${CXXSTD}\
 		$$(\
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_lin/64/lib/pkgconfig\
 			pkg-config --cflags ${LIBS_USED}\
 		)\
 		${RELEASE_FLAGS}\
+		-UPROTOBUF_USE_DLLS\
 		--static -m64\
 		-o ${ELF}\
 		${UTILCO}\
@@ -130,7 +131,20 @@ elf_release: ${LIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@strip ${ELF}
 	@echo "Built target ${ELF}"
 
-%.o: %.cpp
+%.o: %.c ${LIN64}
+	@echo "Building C object $@"
+	@${CC} ${CFLAGS} ${CSTD}\
+		${INCL}\
+		${RELEASE_FLAGS}\
+		-o $@\
+		-c $<\
+		$$(\
+			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_lin/64/lib/pkgconfig\
+			pkg-config --cflags ${LIBS_USED}\
+		)
+	@echo "Built target $@"
+
+%.o: %.cpp ${LIN64}
 	@echo "Building CXX object $@"
 	@${CXX} ${CFLAGS} ${CXXSTD}\
 		${INCL}\
@@ -143,20 +157,8 @@ elf_release: ${LIN64} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 		)
 	@echo "Built target $@"
 
-%.o: %.cc
-	@echo "Building CXX object $@"
-	@${CXX} ${CFLAGS} ${CXXSTD}\
-		${INCL}\
-		${RELEASE_FLAGS}\
-		-o $@\
-		-c $<\
-		$$(\
-			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_lin/64/lib/pkgconfig\
-			pkg-config --cflags ${LIBS_USED}\
-		)
-	@echo "Built target $@"
-
-${PROJECT_ROOT}src/compiled_proto/%.pb.cc: ${PROJECT_ROOT}proto_files/%.proto
+${PROJECT_ROOT}src/compiled_proto/%.pb.cc: ${PROJECT_ROOT}proto_files/%.proto\
+	${LIN64}
 	@if [ -e ${PROJECT_ROOT}libs_lin/64/bin/protoc ]; then\
 		echo "Building from proto file $@";\
 		${PROJECT_ROOT}libs_lin/64/bin/protoc -I${PROJECT_ROOT}proto_files\
@@ -170,7 +172,7 @@ ${PROJECT_ROOT}src/compiled_proto/%.pb.cc: ${PROJECT_ROOT}proto_files/%.proto
 ${PROJECT_ROOT}libs_lin/64/lib/libz.a:
 	@cd ${PROJECT_ROOT}extern/zlib/; ./configure\
 		--prefix=${PROJECT_ROOT}libs_lin/64
-	@${MAKE} -C ${PROJECT_ROOT}extern/zlib -j4 install
+	@${MAKE} -C ${PROJECT_ROOT}extern/zlib install
 	@echo "Built target $@"
 
 ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.a: ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.a
@@ -188,7 +190,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.a: ${PROJECT_ROOT}libs_lin/64/lib/lib
 		-Dprotobuf_BUILD_TESTS=OFF\
 		-DABSL_PROPAGATE_CXX_STD=ON\
 		${PROJECT_ROOT}extern/protobuf/
-	@${MAKE} -C ${PROJECT_ROOT}extern/protobuf/build/lin64 -j4 install
+	@${MAKE} -C ${PROJECT_ROOT}extern/protobuf/build/lin64 install
 	@echo "Built target $@"
 
 ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.a:
@@ -204,7 +206,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.a:
 		-DABSL_BUILD_TESTING=OFF\
 		-DABSL_PROPAGATE_CXX_STD=ON\
 		${PROJECT_ROOT}extern/abseil-cpp/
-	@${MAKE} -C ${PROJECT_ROOT}extern/abseil-cpp/build/lin64 -j4 install
+	@${MAKE} -C ${PROJECT_ROOT}extern/abseil-cpp/build/lin64 install
 	@echo "Built target $@"
 
 ${PROJECT_ROOT}libs_lin/64/lib/libz.so:
@@ -215,7 +217,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libz.so:
 	@cd ${PROJECT_ROOT}extern/zlib/; ./configure \
 		--prefix=${PROJECT_ROOT}libs_lin/64\
 		--enable-shared
-	@${MAKE} -C ./extern/zlib -j4 install
+	@${MAKE} -C ./extern/zlib install
 	@echo "Built target $@"
 
 ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.so: ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.so
@@ -233,7 +235,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.so: ${PROJECT_ROOT}libs_lin/64/lib/li
 		-DABSL_PROPAGATE_CXX_STD=ON\
 		-Dprotobuf_BUILD_TESTS=OFF\
 		${PROJECT_ROOT}extern/protobuf/
-	@${MAKE} -C ${PROJECT_ROOT}extern/protobuf/build/lin64dyn -j4 install
+	@${MAKE} -C ${PROJECT_ROOT}extern/protobuf/build/lin64dyn install
 	@echo "Built target $@"
 
 ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.so:
@@ -250,7 +252,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.so:
 		-DABSL_BUILD_TESTING=OFF\
 		-DABSL_PROPAGATE_CXX_STD=ON\
 		${PROJECT_ROOT}extern/abseil-cpp/
-	@${MAKE} -C ${PROJECT_ROOT}extern/abseil-cpp/build/lin64dyn -j4 install
+	@${MAKE} -C ${PROJECT_ROOT}extern/abseil-cpp/build/lin64dyn install
 	@echo "Built target $@"
 
 .PHONY: default clean elf_debug elf_release

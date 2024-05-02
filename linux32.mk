@@ -4,8 +4,7 @@ PROJECT_ROOT	= ${strip ${dir ${realpath ${lastword ${MAKEFILE_LIST}}}}}
 
 CC				= gcc
 CXX				= g++
-#-Wall -Wpedantic -Wextra
-CFLAGS			=
+CFLAGS			= -m32 -Wall -Wpedantic -Wextra
 CSTD			= --std=c2x
 CXXSTD			= --std=c++20
 RELEASE_FLAGS	= -O3 -g
@@ -118,28 +117,14 @@ elf_release: ${LIN32} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@echo "Building C object $@"
 	@${CC} ${CFLAGS} ${CSTD}\
 		${RELEASE_FLAGS}\
-		-o $@\
-		-c $<\
+		-o $@\ -c $<\
 		$$(\
 			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_lin/64/lib/pkgconfig\
 			pkg-config --cflags ${LIBS_USED}\
 		)
 	@echo "Built target $@"
 
-%.o: %.cpp
-	@echo "Building CXX object $@"
-	@${CXX} ${CFLAGS} ${CXXSTD}\
-		${INCL}\
-		${RELEASE_FLAGS}\
-		-o $@\
-		-c $<\
-		$$(\
-			PKG_CONFIG_PATH=${PROJECT_ROOT}libs_lin/64/lib/pkgconfig\
-			pkg-config --cflags ${LIBS_USED}\
-		)
-	@echo "Built target $@"
-
-%.o: %.cc
+%.o: %.cpp ${LIN32}
 	@echo "Building CXX object $@"
 	@${CXX} ${CFLAGS} ${CXXSTD}\
 		${INCL}\

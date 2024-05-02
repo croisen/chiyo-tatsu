@@ -19,9 +19,10 @@ A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 
 ## Dependencies
 
+-   [abseil-cpp](https://github.com/abseil/abseil-cpp.git)
 -   [protobuf](https://github.com/protocolbuffers/protobuf)
 -   [zlib](https://github.com/madler/zlib)
--   [tachiyomi_source_ids](https://raw.githubusercontent.com/ThePBone/tachiyomi-extensions-revived/repo/index.min.json)
+-   [PBone's Tachiyomi Sources Revived](https://raw.githubusercontent.com/ThePBone/tachiyomi-extensions-revived/repo/index.min.json)
 
 ## Struggles
 
