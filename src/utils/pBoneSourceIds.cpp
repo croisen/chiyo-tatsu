@@ -4,7 +4,7 @@
 
 #include "tachiyomi_source_ids.hpp"
 
-const std::map<int64_t, std::string> tachiyomi::SourceIDs = {
+const std::map<int64_t, std::string> tachiyomi::PBoneSourceIDs = {
 {
    1843646695111412994,
    "Akuma"

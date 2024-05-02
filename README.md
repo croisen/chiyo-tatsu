@@ -4,7 +4,8 @@ A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 
 ## TODOs
 
--   [ ] Figure out the linker errors happening with absl_log_internal
+-   [x] Figure out the linker errors happening with absl_log_internal
+        (well I do hope that this is the end of it)
 -   [ ] How to compile for 32 bit while on an x86_64 machine in linux
 -   [ ] Finish the windows makefiles both 32 and 64 bit with or without prefixes
 -   [ ] Bring back the auto build workflow when every todo is done

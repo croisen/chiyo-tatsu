@@ -2,12 +2,12 @@
 #include <iostream>
 #include <string>
 
-#include "utils/args.hpp"
 #include "utils/chiyotatsu-util.hpp"
 #include "utils/tachiyomi_source_ids.hpp"
 
 int main(int argc, char **argv)
 {
+    chiyotatsu::registerShutdownHook();
     chiyotatsu::defineArgs(argc, argv);
     std::set<std::string> sources;
     std::string input  = chiyotatsu::getInput();
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     for (auto manga : tachiyomi.mangabackup()) {
         std::cout << manga.title() << std::endl;
         int64_t sourceId = manga.source();
-        sources.insert(tachiyomi::SourceIDs.at(sourceId));
+        sources.insert(tachiyomi::PBoneSourceIDs.at(sourceId));
     }
 
     std::cout << std::endl << "Sources:" << std::endl;

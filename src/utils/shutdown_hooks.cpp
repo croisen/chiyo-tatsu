@@ -1,6 +1,6 @@
 #include "google/protobuf/stubs/common.h"
 
-#include "shutdown_hooks.hpp"
+#include "chiyotatsu-util.hpp"
 
 namespace chiyotatsu
 {

@@ -15,3 +15,9 @@
 	path = extern/abseil-cpp
 	url = https://github.com/abseil/abseil-cpp.git
 	branch = lts_2024_01_16
+[submodule "extern/jsoncpp"]
+	path = extern/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git
+[submodule "extern/zip"]
+	path = extern/zip
+	url = https://github.com/nih-at/libzip.git

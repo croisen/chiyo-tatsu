@@ -19,7 +19,6 @@ namespace zlib
 int64_t gunzip(std::string filename, std::vector<uint8_t> *buffer)
 {
     buffer->clear();
-    std::vector<uint8_t> compressedBuffer;
     FILE *compressedFp = std::fopen(filename.c_str(), "rb");
     if (compressedFp == NULL) {
         chiyotatsuLog(CHFAIL, "Failed to open file %s\n", filename.c_str());
@@ -32,7 +31,6 @@ int64_t gunzip(std::string filename, std::vector<uint8_t> *buffer)
     uint8_t out[CHUNK] = {0};
     z_stream strm;
     memset(&strm, 0, sizeof(z_stream));
-
     if (inflateInit2(&strm, (WINDOWBITS + MAX_WBITS)) != Z_OK) {
         chiyotatsuLog(
             CHFAIL, "Failed to decompress file %s\n", filename.c_str()
@@ -51,7 +49,6 @@ int64_t gunzip(std::string filename, std::vector<uint8_t> *buffer)
             );
             return -1;
         }
-
         if (strm.avail_in == 0) {
             break;
         }
@@ -93,7 +90,6 @@ int64_t gunzip(std::string filename, std::vector<uint8_t> *buffer)
     uint64_t decompressedSize = strm.total_out;
     inflateEnd(&strm);
     fclose(compressedFp);
-
     return decompressedSize;
 }
 } // namespace zlib

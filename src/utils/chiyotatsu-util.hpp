@@ -7,6 +7,10 @@
 
 namespace chiyotatsu
 {
+void defineArgs(int argc, char **argv);
+void registerShutdownHook(void);
+void shutdown(void);
+
 std::string getInput(void);
 std::string getOutput(void);
 Backup parseTachiyomiFile(std::string input);
