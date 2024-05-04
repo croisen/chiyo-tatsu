@@ -3,17 +3,12 @@
 #include <cstring>
 #include <string>
 
-#include <vector>
 #include <zconf.h>
 #include <zlib.h>
 
 #include "bread_parser_pair.h"
-#include "chiyotatsu-util.hpp"
+#include "chiyotatsu_util.hpp"
 #include "col_lim_fprintf.hpp"
-#include "gunzip.hpp"
-
-#include "../compiled_proto/tachiyomi.pb.h"
-
 #define CHUNK      262144
 #define WINDOWBITS 16
 
@@ -60,12 +55,20 @@ string getOutput(void)
     return output;
 }
 
-Backup parseTachiyomiFile(string input)
+string getReference(void)
 {
-    Backup tachiyomiBackup;
-    vector tData = vector<uint8_t>();
-    zlib::gunzip(input, &tData);
-    tachiyomiBackup.ParseFromArray(tData.data(), tData.size());
-    return tachiyomiBackup;
+    char *referenceArg = (char *)bParserGetArg('r', NULL, 0);
+    string reference = (referenceArg == NULL) ? string() : string(referenceArg);
+    if (referenceArg == NULL)
+        chiyotatsuPanic(
+            EXIT_FAILURE, CHFAIL, "No output passed into -r or --reference\n"
+        );
+    else if (reference.length() == 0)
+        chiyotatsuPanic(
+            EXIT_FAILURE, CHFAIL,
+            "Backup file passed into -r or --reference is not proper\n",
+        );
+
+    return reference;
 }
 } // namespace chiyotatsu

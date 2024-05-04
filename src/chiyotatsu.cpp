@@ -1,29 +1,31 @@
+#include <cinttypes>
 #include <cstdint>
-#include <iostream>
 #include <string>
 
-#include "utils/chiyotatsu-util.hpp"
-#include "utils/tachiyomi_source_ids.hpp"
+#include "utils/chiyotatsu_util.hpp"
+#include "utils/col_lim_fprintf.hpp"
+#include "utils/kotatsu_utils.hpp"
+#include "utils/tachiyomi_utils.hpp"
 
+using namespace std;
 int main(int argc, char **argv)
 {
     chiyotatsu::registerShutdownHook();
     chiyotatsu::defineArgs(argc, argv);
-    std::set<std::string> sources;
-    std::string input  = chiyotatsu::getInput();
-    std::string output = chiyotatsu::getOutput();
+    string input     = chiyotatsu::getInput();
+    string output    = chiyotatsu::getOutput();
+    string reference = chiyotatsu::getReference();
 
-    Backup tachiyomi   = chiyotatsu::parseTachiyomiFile(input);
+    Backup tachiyomi = tachiyomi::parseTachiyomiFile(input);
+    chiyotatsuLog(
+        CHINFO, "Book(?) Count %" PRIu64 "\n",
+        (uint64_t)tachiyomi.mangabackup().size()
+    );
+    chiyotatsuLog(
+        CHINFO, "Source Count: %" PRIu64 "\n",
+        (uint64_t)tachiyomi.sources().size()
+    );
 
-    for (auto manga : tachiyomi.mangabackup()) {
-        std::cout << manga.title() << std::endl;
-        int64_t sourceId = manga.source();
-        sources.insert(tachiyomi::PBoneSourceIDs.at(sourceId));
-    }
-
-    std::cout << std::endl << "Sources:" << std::endl;
-    for (auto source : sources)
-        std::cout << source << std::endl;
-
+    kotatsu::readReference(reference);
     return 0;
 }

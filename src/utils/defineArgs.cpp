@@ -1,5 +1,5 @@
 #include "bread_parser_pair.h"
-#include "chiyotatsu-util.hpp"
+#include "chiyotatsu_util.hpp"
 
 namespace chiyotatsu
 {
@@ -19,6 +19,12 @@ void defineArgs(int argc, char **argv)
         'o', NULL, "Provide an output filename as the kotatsu backup"
     );
     bParserAddArgs('o', NULL, 1, STRBP);
+
+    bParserAddOpts('r', "reference", 1);
+    bParserAddDesc(
+        'r', NULL, "Provide a filename to be referenced as a kotatsu backup"
+    );
+    bParserAddArgs('r', NULL, 1, STRBP);
 
     bParserParse(argc, argv);
 }

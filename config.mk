@@ -72,6 +72,8 @@ ABSL_PROTOBUF_AND_ZLIB=\
 					   -labsl_base\
 					   -lutf8_validity\
 					   -lutf8_range\
+					   -ljsoncpp\
+					   -lzip\
 					   -lz
 
 clean:

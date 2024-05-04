@@ -104,4 +104,43 @@ ${PROJECT_ROOT}libs_lin/32/lib/libabsl_civil_time.a:
 	@${MAKE} -C ${PROJECT_ROOT}extern/abseil-cpp/build/lin32 -j4 install
 	@echo "Built target $@"
 
+${PROJECT_ROOT}libs_lin/32/lib/libjsoncpp.a:
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/32/include ]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/lib;\
+	fi
+	@cmake -B ${PROJECT_ROOT}extern/jsoncpp/build/lin32dyn\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/32\
+		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/32\
+		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_CXX_FLAGS="-m32"\
+		-DBUILD_SHARED_LIBS=OFF\
+		${PROJECT_ROOT}extern/jsoncpp/
+	@${MAKE} -C ${PROJECT_ROOT}extern/jsoncpp/build/lin32dyn install
+	@echo "Built target $@"
+
+${PROJECT_ROOT}libs_lin/32/lib/libzip.a: ${PROJECT_ROOT}libs_lin/32/lib/libz.a
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/32/include ]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/lib;\
+	fi
+	@cmake -B ${PROJECT_ROOT}extern/zip/build/lin32dyn\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/32\
+		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/32\
+		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_CXX_FLAGS="-m32"\
+		-DCMAKE_CXX_STANDARD=20\
+		-DBUILD_SHARED_LIBS=OFF\
+		-DENABLE_COMMONCRYPTO=OFF\
+		-DENABLE_GNUTLS=OFF\
+		-DENABLE_MBEDTLS=OFF\
+		-DENABLE_OPENSSL=OFF\
+		-DENABLE_BZIP2=OFF\
+		-DENABLE_LZMA=OFF\
+		-DENABLE_ZSTD=OFF\
+		${PROJECT_ROOT}extern/zip/
+	@${MAKE} -C ${PROJECT_ROOT}extern/zip/build/lin32dyn install
+	@echo "Built target $@"
+
+
 .PHONY: default clean elf_release

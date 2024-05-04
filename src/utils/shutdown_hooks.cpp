@@ -1,6 +1,6 @@
 #include "google/protobuf/stubs/common.h"
 
-#include "chiyotatsu-util.hpp"
+#include "chiyotatsu_util.hpp"
 
 namespace chiyotatsu
 {
