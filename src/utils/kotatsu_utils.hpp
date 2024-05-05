@@ -42,7 +42,7 @@ typedef struct History {
     int64_t manga_id;
     uint64_t created_at;
     uint64_t updated_at;
-    uint64_t chapter_id;
+    int64_t chapter_id;
     uint64_t page;
     uint64_t scroll;
     double percent;

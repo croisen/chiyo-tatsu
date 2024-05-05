@@ -4,7 +4,8 @@
 #include <string>
 
 #include "zip.h"
-#include "json/json.h"
+#include "json/reader.h"
+#include "json/value.h"
 
 #include "col_lim_fprintf.hpp"
 #include "kotatsu_utils.hpp"
@@ -13,8 +14,7 @@
 using namespace std;
 
 static bool parseKotatsuJson(
-    const char *name, const char *txt, const uint64_t size,
-    kotatsu::KotatsuBackup kBackup
+    const char *name, const char *txt, kotatsu::KotatsuBackup kBackup
 )
 {
     Json::Value root;
@@ -31,11 +31,97 @@ static bool parseKotatsuJson(
     }
 
     if (strcmp(name, "index") == 0) {
-        kotatsu::Index index;
-        index.app_id      = root[0]["app_id"].asString();
-        index.app_version = root[0]["app_version"].asUInt64();
-        index.created_at  = root[0]["created_at"].asUInt64();
-        kBackup.index.push_back(index);
+        for (unsigned int i = 0; i < root.size(); i += 1) {
+            kotatsu::Index index;
+            index.app_id      = root[i]["app_id"].asString();
+            index.app_version = root[i]["app_version"].asUInt64();
+            index.created_at  = root[i]["created_at"].asUInt64();
+            kBackup.index.push_back(index);
+        }
+
+        return true;
+    }
+
+    if (strcmp(name, "history") == 0) {
+        for (unsigned int i = 0; i < root.size(); i += 1) {
+            kotatsu::History hist;
+            hist.chapter_id = root[i]["chapter_id"].asInt64();
+            hist.created_at = root[i]["created_at"].asUInt64();
+            hist.manga_id   = root[i]["manga_id"].asInt64();
+            hist.page       = root[i]["page"].asUInt64();
+            hist.percent    = root[i]["percent"].asDouble();
+            hist.scroll     = root[i]["scroll"].asUInt64();
+            hist.updated_at = root[i]["updated_at"].asUInt64();
+            kBackup.history.push_back(hist);
+        }
+
+        return true;
+    }
+
+    if (strcmp(name, "categories") == 0) {
+        for (unsigned int i = 0; i < root.size(); i += 1) {
+            kotatsu::Categories cat;
+            cat.category_id = root[i]["category_id"].asUInt64();
+            cat.created_at  = root[i]["created_at"].asUInt64();
+            cat.order       = root[i]["order"].asString();
+            cat.show_in_lib = root[i]["show_in_lib"].asBool();
+            cat.sort_key    = root[i]["sort_key"].asInt64();
+            cat.title       = root[i]["title"].asString();
+            cat.track       = root[i]["track"].asBool();
+            kBackup.categories.push_back(cat);
+        }
+
+        return true;
+    }
+
+    if (strcmp(name, "favourites") == 0) {
+        for (unsigned int i = 0; i < root.size(); i += 1) {
+            kotatsu::Favourites fav;
+            fav.manga.alt_title  = root[i]["alt_title"].asString();
+            fav.manga.title      = root[i]["title"].asString();
+            fav.manga.author     = root[i]["author"].asString();
+            fav.manga.cover_url  = root[i]["cover_url"].asString();
+            fav.manga.id         = root[i]["id"].asInt64();
+            fav.manga.nsfw       = root[i]["nsfw"].asBool();
+            fav.manga.public_url = root[i]["public_url"].asString();
+            fav.manga.rating     = root[i]["rating"].asDouble();
+            fav.manga.source     = root[i]["source"].asString();
+            fav.manga.state      = root[i]["state"].asString();
+            fav.manga.url        = root[i]["url"].asString();
+            for (unsigned int ii = 0; i < root[i]["tags"].size(); i += 1) {
+                kotatsu::Tags tag;
+                tag.id     = root[i]["tags"][ii]["id"].asInt64();
+                tag.key    = root[i]["tags"][ii]["key"].asString();
+                tag.source = root[i]["tags"][ii]["source"].asString();
+                tag.title  = root[i]["tags"][ii]["title"].asString();
+                fav.manga.tags.push_back(tag);
+            }
+
+            kBackup.favourites.push_back(fav);
+        }
+
+        return true;
+    }
+
+    if (strcmp(name, "bookmarks") == 0) {
+        chiyotatsuLog(CHWARN, "Idk how to parse bookmarks\n");
+        return true;
+    }
+
+    if (strcmp(name, "sources") == 0) {
+        for (unsigned int i = 0; i < root.size(); i += 1) {
+            kotatsu::Sources src;
+            src.enabled  = root[i]["enabled"].asBool();
+            src.sort_key = root[i]["sort_key"].asInt64();
+            src.source   = root[i]["source"].asString();
+            kBackup.sources.push_back(src);
+        }
+
+        return true;
+    }
+
+    if (strcmp(name, "settings") == 0) {
+        chiyotatsuLog(CHWARN, "Idk how to parse settings\n");
         return true;
     }
 
@@ -76,7 +162,7 @@ KotatsuBackup readReference(string reference)
         kZipFD = zip_fopen_index(kZipRef, count, 0);
         zip_fread(kZipFD, txt, kZipInfo->size);
         chiyotatsuLog(CHINFO, "Parsing kotatsu file: %s\n", kZipInfo->name);
-        if (!parseKotatsuJson(kZipInfo->name, txt, kZipInfo->size, kBackup))
+        if (!parseKotatsuJson(kZipInfo->name, txt, kBackup))
             goto parsing_json_failed; // HAHAHAHAHAHAHAHAHAA
 
         zip_fclose(kZipFD);
