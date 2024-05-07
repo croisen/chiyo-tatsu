@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "json/value.h"
+
 namespace kotatsu
 {
 typedef struct Tags {
@@ -59,6 +61,10 @@ typedef struct Categories {
 } Categories;
 
 typedef struct Favourites {
+    int64_t manga_id;
+    int64_t category_id;
+    int64_t sort_key;
+    uint64_t created_at;
     Manga manga;
 } Favourites;
 
@@ -75,10 +81,12 @@ typedef struct KotatsuBackup {
     std::vector<Favourites> favourites = std::vector<Favourites>();
     std::vector<Sources> sources       = std::vector<Sources>();
     // bookmarks;
+    Json::Value bookmarks;
     // settings;
+    Json::Value settings;
 } KotatsuBackup;
 
-void saveToFile(std::string zipName, KotatsuBackup *kotatsuBackup);
+void saveToFile(std::string zipName, KotatsuBackup kotatsuBackup);
 KotatsuBackup readReference(std::string reference);
 } // namespace kotatsu
 

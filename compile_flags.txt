@@ -1,9 +1,9 @@
 -I
-libs_lin/64/include
--I
 libs_lin/32/include
 -I
-libs_win/64/include
+libs_lin/64/include
 -I
 libs_win/32/include
+-I
+libs_win/64/include
 --std=c++20

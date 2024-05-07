@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option optimize_for = LITE_RUNTIME;
+
 import 'backup_chapter.proto';
 import 'backup_history.proto';
 import 'backup_tracking.proto';

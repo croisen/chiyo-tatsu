@@ -1,4 +1,4 @@
-#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/message_lite.h"
 
 #include "chiyotatsu_util.hpp"
 

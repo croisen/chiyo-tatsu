@@ -14,10 +14,17 @@ A backup file converter from Tachiyomi to Kotatsu (a very wip project)
 -   [x] Decompress the tachiyomi backup file
 -   [x] Parse the tachiyomi backup file with protobuf
 -   [x] Get the source IDs for tachiyomi
+-   [x] Figure out how the backups of kotatsu works (Sorta)
 -   [ ] Figure out how the backups of kotatsu works
+-   [x] Hope there's an easy 1 to 1 conversion and no mandatory fields in the
+        kotatsu backups (there kinda is?)
 -   [ ] Hope there's an easy 1 to 1 conversion and no mandatory fields in the
         kotatsu backups
 -   [ ] Kotatsu, where is your database, please help
+-   [ ] Idk why jsoncpp writes null when using cout and indexing it directly
+        works
+-   [ ] May the default rando values not be needed when the db comes to light
+        (I don't have any experience with kotlin other than this :()
 
 ## Dependencies
 

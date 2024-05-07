@@ -21,3 +21,6 @@
 [submodule "extern/zip"]
 	path = extern/zip
 	url = https://github.com/nih-at/libzip.git
+[submodule "extern/zippp"]
+	path = extern/zippp
+	url = https://github.com/ctabin/libzippp.git

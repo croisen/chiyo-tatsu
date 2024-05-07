@@ -1,11 +1,12 @@
 include config.mk
 
-ELF				= chiyotatsu64.elf
+ELF				= chiyotatsu64_dbg.elf
 
 LIN64DYN		= ${PROJECT_ROOT}libs_lin/64/lib/libz.so\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.so\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.so\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libzip.so\
+				  ${PROJECT_ROOT}libs_lin/64/lib/libzippp.so\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libjsoncpp.so
 
 default:
@@ -31,7 +32,7 @@ elf_debug: ${LIN64DYN} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@echo "Building C object $@"
 	@${CC} ${CFLAGS} ${CSTD} -m64\
 		-isystem ${PROJECT_ROOT}libs_lin/64/include\
-		${RELEASE_FLAGS}\
+		${DEBUG_FLAGS}\
 		-o $@\
 		-c $<
 	@echo "Built target $@"
@@ -40,7 +41,7 @@ elf_debug: ${LIN64DYN} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@echo "Building CXX object $@"
 	@${CXX} ${CFLAGS} ${CXXSTD} -m64\
 		-isystem ${PROJECT_ROOT}libs_lin/64/include\
-		${RELEASE_FLAGS}\
+		${DEBUG_FLAGS}\
 		-o $@\
 		-c $<
 	@echo "Built target $@"
@@ -49,7 +50,7 @@ elf_debug: ${LIN64DYN} ${PROTOCPP} ${UTILCO} ${UTILCPPO} ${PROTO_O}
 	@echo "Building CXX object $@"
 	@${CXX} ${CFLAGS} ${CXXSTD} -m64\
 		-isystem ${PROJECT_ROOT}libs_lin/64/include\
-		${RELEASE_FLAGS}\
+		${DEBUG_FLAGS}\
 		-o $@\
 		-c $<
 	@echo "Built target $@"
@@ -85,7 +86,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.so: ${PROJECT_ROOT}libs_lin/64/lib/li
 	@cmake -B ${PROJECT_ROOT}extern/protobuf/build/lin64dyn\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
 		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/64\
-		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_BUILD_TYPE=Debug\
 		-DCMAKE_CXX_FLAGS="-m64"\
 		-DCMAKE_CXX_STANDARD=20\
 		-Dprotobuf_ABSL_PROVIDER='package'\
@@ -103,7 +104,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.so:
 	@cmake -B ${PROJECT_ROOT}extern/abseil-cpp/build/lin64dyn\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
 		-DBUILD_SHARED_LIBS=ON\
-		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_BUILD_TYPE=Debug\
 		-DCMAKE_CXX_FLAGS="-m64"\
 		-DCMAKE_CXX_STANDARD=20\
 		-DABSL_BUILD_TESTING=OFF\
@@ -120,11 +121,27 @@ ${PROJECT_ROOT}libs_lin/64/lib/libjsoncpp.so:
 	@cmake -B ${PROJECT_ROOT}extern/jsoncpp/build/lin64dyn\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
 		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/64\
-		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_BUILD_TYPE=Debug\
 		-DCMAKE_CXX_FLAGS="-m64"\
 		-DBUILD_SHARED_LIBS=ON\
 		${PROJECT_ROOT}extern/jsoncpp/
 	@${MAKE} -C ${PROJECT_ROOT}extern/jsoncpp/build/lin64dyn install
+	@echo "Built target $@"
+
+${PROJECT_ROOT}libs_lin/64/lib/libzippp.so: ${PROJECT_ROOT}libs_lin/64/lib/libzip.so
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/64/include ]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/lib;\
+	fi
+	@cmake -B ${PROJECT_ROOT}extern/zippp/build/lin64dyn\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
+		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/64\
+		-DCMAKE_BUILD_TYPE=Debug\
+		-DCMAKE_CXX_FLAGS="-m64"\
+		-DCMAKE_CXX_STANDARD=20\
+		-DBUILD_SHARED_LIBS=ON\
+		${PROJECT_ROOT}extern/zippp/
+	@${MAKE} -C ${PROJECT_ROOT}extern/zippp/build/lin64dyn install
 	@echo "Built target $@"
 
 ${PROJECT_ROOT}libs_lin/64/lib/libzip.so: ${PROJECT_ROOT}libs_lin/64/lib/libz.so
@@ -135,7 +152,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libzip.so: ${PROJECT_ROOT}libs_lin/64/lib/libz.so
 	@cmake -B ${PROJECT_ROOT}extern/zip/build/lin64dyn\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
 		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/64\
-		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_BUILD_TYPE=Debug\
 		-DCMAKE_CXX_FLAGS="-m64"\
 		-DCMAKE_CXX_STANDARD=20\
 		-DBUILD_SHARED_LIBS=ON\
@@ -143,4 +160,4 @@ ${PROJECT_ROOT}libs_lin/64/lib/libzip.so: ${PROJECT_ROOT}libs_lin/64/lib/libz.so
 	@${MAKE} -C ${PROJECT_ROOT}extern/zip/build/lin64dyn install
 	@echo "Built target $@"
 
-.PHONY: default clean elf_debug elf_debug
+.PHONY: default clean elf_debug

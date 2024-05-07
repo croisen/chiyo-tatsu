@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option optimize_for = LITE_RUNTIME;
+
 message BrokenBackupSource {
     string name = 1;
     int64 sourceId = 2;

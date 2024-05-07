@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option optimize_for = LITE_RUNTIME;
+
 import 'backup_category.proto';
 import 'backup_manga.proto';
 import 'backup_preference.proto';

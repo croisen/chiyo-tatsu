@@ -1,7 +1,12 @@
 include config.mk
 
 ELF				= chiyotatsu32.elf
-LIN32			= ${PROJECT_ROOT}libs_lin/32/lib/libz.a ${PROJECT_ROOT}libs_lin/32/lib/libabsl_civil_time.a ${PROJECT_ROOT}libs_lin/32/lib/libprotobuf.a
+LIN32			= ${PROJECT_ROOT}libs_lin/32/lib/libz.a\
+				  ${PROJECT_ROOT}libs_lin/32/lib/libabsl_civil_time.a\
+				  ${PROJECT_ROOT}libs_lin/32/lib/libprotobuf.a\
+				  ${PROJECT_ROOT}libs_lin/32/lib/libzippp.a\
+				  ${PROJECT_ROOT}libs_lin/32/lib/libzip.a\
+				  ${PROJECT_ROOT}libs_lin/32/lib/libjsoncpp.a
 
 default:
 	@echo "It would be better if this was run with the 'clean' argument first"
@@ -118,6 +123,25 @@ ${PROJECT_ROOT}libs_lin/32/lib/libjsoncpp.a:
 		${PROJECT_ROOT}extern/jsoncpp/
 	@${MAKE} -C ${PROJECT_ROOT}extern/jsoncpp/build/lin32dyn install
 	@echo "Built target $@"
+
+${PROJECT_ROOT}libs_lin/32/lib/libzippp.a: ${PROJECT_ROOT}libs_lin/64/lib/libzip.a
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/32/include ]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/32/lib;\
+	fi
+	@cmake -B ${PROJECT_ROOT}extern/zippp/build/lin32\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/32\
+		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/32\
+		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_CXX_FLAGS="-m32"\
+		-DCMAKE_CXX_STANDARD=20\
+		-DBUILD_SHARED_LIBS=OFF\
+		${PROJECT_ROOT}extern/zippp/
+	@${MAKE} -C ${PROJECT_ROOT}extern/zippp/build/lin32 install
+	@mv ${PROJECT_ROOT}libs_lin/32/lib/libzippp_static.a \
+		${PROJECT_ROOT}libs_lin/32/lib/libzippp.a
+	@echo "Built target $@"
+
 
 ${PROJECT_ROOT}libs_lin/32/lib/libzip.a: ${PROJECT_ROOT}libs_lin/32/lib/libz.a
 	@if [ ! -d ${PROJECT_ROOT}libs_lin/32/include ]; then\

@@ -26,6 +26,8 @@ int main(int argc, char **argv)
         (uint64_t)tachiyomi.sources().size()
     );
 
-    kotatsu::readReference(reference);
+    kotatsu::KotatsuBackup kRef = kotatsu::readReference(reference);
+    chiyotatsu::chiyototatsu(&tachiyomi, &kRef);
+    kotatsu::saveToFile(output, kRef);
     return 0;
 }

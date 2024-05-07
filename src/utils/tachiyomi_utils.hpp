@@ -9,7 +9,12 @@
 
 namespace tachiyomi
 {
-extern const std::map<int64_t, std::string> PBoneSourceIDs;
+typedef struct TachiyomiSource {
+    std::string name;
+    std::string baseUrl;
+} TachiyomiSource;
+
+extern const std::map<int64_t, TachiyomiSource> PBoneSourceIDs;
 Backup parseTachiyomiFile(std::string input);
 } // namespace tachiyomi
 

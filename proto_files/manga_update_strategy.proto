@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option optimize_for = LITE_RUNTIME;
+
 enum UpdateStrategy {
   ALWAYS_UPDATE = 0;
   ONLY_FETCH_ONCE = 1;

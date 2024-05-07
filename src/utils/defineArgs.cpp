@@ -6,7 +6,7 @@ namespace chiyotatsu
 void defineArgs(int argc, char **argv)
 {
     bParserSetProgramName((char *)"chiyotatsu");
-    bParserSetProgramVersion((char *)"v0.1.1");
+    bParserSetProgramVersion((char *)"v0.1.2");
     bParserSetAuthorName((char *)"croisen");
     bParserSetAuthorEmail((char *)"andrewjames.git.gan@gmail.com");
 

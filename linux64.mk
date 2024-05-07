@@ -4,7 +4,10 @@ ELF				= chiyotatsu64.elf
 LIN64			= ${PROJECT_ROOT}libs_lin/64/lib/libz.a\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.a\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.a\
-				  ${PROJECT_ROOT}libs_lin/64/lib/libzip.a
+				  ${PROJECT_ROOT}libs_lin/64/lib/libzippp.a\
+				  ${PROJECT_ROOT}libs_lin/64/lib/libzip.a\
+				  ${PROJECT_ROOT}libs_lin/64/lib/libjsoncpp.a
+
 default:
 	@echo "It would be better if this was run with the 'clean' argument first"
 	@echo "Then use the elf_release"
@@ -119,6 +122,24 @@ ${PROJECT_ROOT}libs_lin/64/lib/libjsoncpp.a:
 	@${MAKE} -C ${PROJECT_ROOT}extern/jsoncpp/build/lin64dyn install
 	@echo "Built target $@"
 
+${PROJECT_ROOT}libs_lin/64/lib/libzippp.a: ${PROJECT_ROOT}libs_lin/64/lib/libzip.a
+	@if [ ! -d ${PROJECT_ROOT}libs_lin/64/include ]; then\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/include;\
+		mkdir -p ${PROJECT_ROOT}libs_lin/64/lib;\
+	fi
+	@cmake -B ${PROJECT_ROOT}extern/zippp/build/lin64\
+		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
+		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/64\
+		-DCMAKE_BUILD_TYPE=Release\
+		-DCMAKE_CXX_FLAGS="-m64"\
+		-DCMAKE_CXX_STANDARD=20\
+		-DBUILD_SHARED_LIBS=OFF\
+		${PROJECT_ROOT}extern/zippp/
+	@${MAKE} -C ${PROJECT_ROOT}extern/zippp/build/lin64 install
+	@mv ${PROJECT_ROOT}libs_lin/64/lib/libzippp_static.a \
+		${PROJECT_ROOT}libs_lin/64/lib/libzippp.a
+	@echo "Built target $@"
+
 ${PROJECT_ROOT}libs_lin/64/lib/libzip.a: ${PROJECT_ROOT}libs_lin/64/lib/libz.a
 	@if [ ! -d ${PROJECT_ROOT}libs_lin/64/include ]; then\
 		mkdir -p ${PROJECT_ROOT}libs_lin/64/include;\
@@ -136,6 +157,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libzip.a: ${PROJECT_ROOT}libs_lin/64/lib/libz.a
 		-DENABLE_MBEDTLS=OFF\
 		-DENABLE_OPENSSL=OFF\
 		-DENABLE_BZIP2=OFF\
+LIN32			= ${PROJECT_ROOT}libs_lin/32/lib/libz.a ${PROJECT_ROOT}libs_lin/32/lib/libabsl_civil_time.a ${PROJECT_ROOT}libs_lin/32/lib/libprotobuf.a
 		-DENABLE_LZMA=OFF\
 		-DENABLE_ZSTD=OFF\
 		${PROJECT_ROOT}extern/zip/

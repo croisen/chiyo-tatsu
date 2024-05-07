@@ -1,3 +1,8 @@
+#include <ctime>
+
+#include "../compiled_proto/backup_category.pb.h"
+#include "../compiled_proto/tachiyomi.pb.h"
+
 #include "chiyotatsu_util.hpp"
 #include "kotatsu_utils.hpp"
 #include "tachiyomi_utils.hpp"
@@ -7,7 +12,7 @@ using namespace std;
 
 namespace chiyotatsu
 {
-KotatsuBackup *chiyototatsu(Backup *tachiyomiBackup, KotatsuBackup *reference)
+void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
 {
     // (To be copied over if there's a reference file)
     // Index, History, Bookmarks, Sources, Settings
@@ -15,12 +20,12 @@ KotatsuBackup *chiyototatsu(Backup *tachiyomiBackup, KotatsuBackup *reference)
     // Favourites (kotatsu) + MangaBackups (tachiyomi)
 
     // Append categories
+    int64_t origCatCount = reference->categories.size();
     for (auto tCat : tachiyomiBackup->categories()) {
         Categories kCat;
         kCat.created_at  = time(NULL);
-        kCat.category_id = reference->categories.size();
-        kCat.title       = "CHTSU - ";
-        kCat.title.append(tCat.name());
+        kCat.category_id = origCatCount + tCat.order();
+        kCat.title       = "CHTSU - " + tCat.name();
 
         // Rando default values
         kCat.show_in_lib = true;
@@ -33,23 +38,38 @@ KotatsuBackup *chiyototatsu(Backup *tachiyomiBackup, KotatsuBackup *reference)
 
     for (auto tManga : tachiyomiBackup->mangabackup()) {
         Favourites kManga;
+
         kManga.manga.title  = tManga.title();
         kManga.manga.author = tManga.author();
 
-        string source       = tachiyomi::PBoneSourceIDs.at(tManga.source());
-        transform(source.begin(), source.end(), source.begin(), ::toupper);
-        kManga.manga.source    = source;
+        tachiyomi::TachiyomiSource source =
+            tachiyomi::PBoneSourceIDs.at(tManga.source());
+        transform(
+            source.name.begin(), source.name.end(), source.name.begin(),
+            ::toupper
+        );
+        kManga.manga.source    = source.name;
+        kManga.manga.url       = source.baseUrl + tManga.url();
+        kManga.manga.cover_url = source.baseUrl + tManga.thumbnailurl();
 
-        // Needs the full url but tachiyomi only keeps the partial one?
-        // Gotta change the hashmap
-        kManga.manga.url       = tManga.url();
-        kManga.manga.cover_url = tManga.thumbnailurl();
-
-        // Rando default values again
+        // Rando values again
         kManga.manga.nsfw      = false;
         kManga.manga.rating    = 4.20F;
-    }
+        kManga.manga.tags      = {};
+        kManga.manga.id        = 0;
+        kManga.manga.alt_title = "";
 
-    return reference;
+        // Rando values again
+        kManga.category_id =
+            reference->categories.size() - 1; // Last one for now
+        kManga.created_at  = time(NULL);
+        kManga.manga_id    = 0;
+        kManga.sort_key    = 0;
+
+        // tManga.status(); I dunno what this enum turns out to be
+        kManga.manga.state = "";
+
+        reference->favourites.push_back(kManga);
+    }
 }
 } // namespace chiyotatsu

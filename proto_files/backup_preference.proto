@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option optimize_for = LITE_RUNTIME;
+
 message BackupPreference {
   string key = 1;
   oneof value {

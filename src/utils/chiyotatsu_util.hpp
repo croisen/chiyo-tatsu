@@ -16,8 +16,9 @@ std::string getInput(void);
 std::string getOutput(void);
 std::string getReference(void);
 Backup parseTachiyomiFile(std::string input);
-kotatsu::KotatsuBackup *
-chiyototatsu(Backup *tachiyomiBackup, kotatsu::KotatsuBackup *reference);
+void chiyototatsu(
+    const Backup *tachiyomiBackup, kotatsu::KotatsuBackup *reference
+);
 } // namespace chiyotatsu
 
 #endif // __CHIYOTATSU_UTIL__

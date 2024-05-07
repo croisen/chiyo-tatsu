@@ -6,7 +6,7 @@ CFLAGS			= -Wall -Wpedantic -Wextra
 CSTD			= --std=c2x
 CXXSTD			= --std=c++20
 RELEASE_FLAGS	= -O3 -g
-DEBUG_FLAGS		= -O0 -g
+DEBUG_FLAGS		= -O0 -g -fsanitize=address
 
 MAIN			= ${PROJECT_ROOT}src/chiyotatsu.cpp
 UTILC			= ${wildcard ${PROJECT_ROOT}src/utils/*.c}
@@ -23,7 +23,7 @@ PROTO_O			= ${patsubst %.cc,%.o,${PROTOCPP}}
 # as dictated by g++ (took 3 hours...)
 # I sure hope this would work in gh workflow
 ABSL_PROTOBUF_AND_ZLIB=\
-					   -lprotobuf\
+					   -lprotobuf-lite\
 					   -labsl_statusor\
 					   -labsl_cord\
 					   -labsl_cordz_functions\
@@ -73,6 +73,7 @@ ABSL_PROTOBUF_AND_ZLIB=\
 					   -lutf8_validity\
 					   -lutf8_range\
 					   -ljsoncpp\
+					   -lzippp\
 					   -lzip\
 					   -lz
 
