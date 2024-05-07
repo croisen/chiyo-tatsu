@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 
 #include "libzippp/libzippp.h"
@@ -72,8 +71,6 @@ void saveToFile(string zipName, const KotatsuBackup kotatsuBackup)
         favourites[i]["manga"]["url"] = kotatsuBackup.favourites[i].manga.url;
         for (unsigned int ii                                       = 0;
              i < kotatsuBackup.favourites[i].manga.tags.size(); i += 1) {
-            favourites[i]["manga"]         = {};
-            favourites[i]["manga"]["tags"] = {};
             favourites[i]["manga"]["tags"][ii]["id"] =
                 kotatsuBackup.favourites[i].manga.tags[ii].id;
             favourites[i]["manga"]["tags"][ii]["key"] =

@@ -19,8 +19,20 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
     // Categories (kotatsu) + categories (tachiyomi, prepended with chtsu)
     // Favourites (kotatsu) + MangaBackups (tachiyomi)
 
-    // Append categories
-    int64_t origCatCount = reference->categories.size();
+    // Append categories (count starts at 1 too so)
+    // and tachiyomi doesn't count it's default category too
+
+    Categories kCatDef = {
+        .category_id = reference->categories.size(),
+        .created_at  = (uint64_t)time(NULL),
+        .sort_key    = (int64_t)reference->categories.size(),
+        .title       = "CHSTU - Default",
+        .order       = "NEWEST",
+        .track       = false,
+        .show_in_lib = false,
+    };
+    reference->categories.push_back(kCatDef);
+    int64_t origCatCount = reference->categories.size() - 1;
     for (auto tCat : tachiyomiBackup->categories()) {
         Categories kCat;
         kCat.created_at  = time(NULL);
@@ -31,7 +43,7 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
         kCat.show_in_lib = true;
         kCat.track       = false;
         kCat.order       = "NEWEST";
-        kCat.sort_key    = reference->categories.size();
+        kCat.sort_key    = reference->categories.size() - 1;
 
         reference->categories.push_back(kCat);
     }
@@ -48,9 +60,11 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
             source.name.begin(), source.name.end(), source.name.begin(),
             ::toupper
         );
+
+        // Turns out the change in the hashmap wasn't needed
         kManga.manga.source    = source.name;
-        kManga.manga.url       = source.baseUrl + tManga.url();
-        kManga.manga.cover_url = source.baseUrl + tManga.thumbnailurl();
+        kManga.manga.url       = tManga.url();
+        kManga.manga.cover_url = tManga.thumbnailurl();
 
         // Rando values again
         kManga.manga.nsfw      = false;
@@ -60,14 +74,15 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
         kManga.manga.alt_title = "";
 
         // Rando values again
-        kManga.category_id =
-            reference->categories.size() - 1; // Last one for now
-        kManga.created_at  = time(NULL);
-        kManga.manga_id    = 0;
-        kManga.sort_key    = 0;
+        kManga.category_id     = (tManga.categories_size() >= 1)
+                                     ? tManga.categories(0) + origCatCount
+                                     : origCatCount;
+        kManga.created_at      = time(NULL);
+        kManga.manga_id        = 0;
+        kManga.sort_key        = 0;
 
         // tManga.status(); I dunno what this enum turns out to be
-        kManga.manga.state = "";
+        kManga.manga.state     = "";
 
         reference->favourites.push_back(kManga);
     }

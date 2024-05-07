@@ -75,23 +75,28 @@ static bool parseKotatsuJson(
     if (strcmp(name, "favourites") == 0) {
         for (auto fav : root) {
             kotatsu::Favourites favourite;
-            favourite.manga.alt_title  = fav["alt_title"].asString();
-            favourite.manga.title      = fav["title"].asString();
-            favourite.manga.author     = fav["author"].asString();
-            favourite.manga.cover_url  = fav["cover_url"].asString();
-            favourite.manga.id         = fav["id"].asInt64();
-            favourite.manga.nsfw       = fav["nsfw"].asBool();
-            favourite.manga.public_url = fav["public_url"].asString();
-            favourite.manga.rating     = fav["rating"].asDouble();
-            favourite.manga.source     = fav["source"].asString();
-            favourite.manga.state      = fav["state"].asString();
-            favourite.manga.url        = fav["url"].asString();
-            for (auto tag : fav) {
+            favourite.category_id      = fav["category_id"].asInt64();
+            favourite.created_at       = fav["created_at"].asUInt64();
+            favourite.manga_id         = fav["manga_id"].asInt64();
+            favourite.sort_key         = fav["sort_key"].asInt64();
+
+            favourite.manga.alt_title  = fav["manga"]["alt_title"].asString();
+            favourite.manga.title      = fav["manga"]["title"].asString();
+            favourite.manga.author     = fav["manga"]["author"].asString();
+            favourite.manga.cover_url  = fav["manga"]["cover_url"].asString();
+            favourite.manga.id         = fav["manga"]["id"].asInt64();
+            favourite.manga.nsfw       = fav["manga"]["nsfw"].asBool();
+            favourite.manga.public_url = fav["manga"]["public_url"].asString();
+            favourite.manga.rating     = fav["manga"]["rating"].asDouble();
+            favourite.manga.source     = fav["manga"]["source"].asString();
+            favourite.manga.state      = fav["manga"]["state"].asString();
+            favourite.manga.url        = fav["manga"]["url"].asString();
+            for (auto tag : fav["manga"]["tags"]) {
                 kotatsu::Tags tags;
-                tags.id     = fav["id"].asInt64();
-                tags.key    = fav["key"].asString();
-                tags.source = fav["source"].asString();
-                tags.title  = fav["title"].asString();
+                tags.id     = tag["id"].asInt64();
+                tags.key    = tag["key"].asString();
+                tags.source = tag["source"].asString();
+                tags.title  = tag["title"].asString();
                 favourite.manga.tags.push_back(tags);
             }
 
@@ -140,10 +145,15 @@ KotatsuBackup readReference(string reference)
     ZipArchive kZipRef(reference);
     kZipRef.open(ZipArchive::ReadOnly);
     vector<ZipEntry> kModules = kZipRef.getEntries();
-    for (auto kModule : kModules)
+    for (auto kModule : kModules) {
+        chiyotatsuLog(
+            CHINFO, "Now parsing kotatsu module: %s\n",
+            kModule.getName().c_str()
+        );
         parseKotatsuJson(
             kModule.getName().c_str(), kModule.readAsText().c_str(), &kBackup
         );
+    }
 
     kZipRef.close();
     return kBackup;
