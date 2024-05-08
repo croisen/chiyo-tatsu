@@ -31,7 +31,7 @@ jobs:
               run: |
                   make -f linux64.mk clean
                   make -f linux64.mk -j4 elf_release
-                  mv chiyotatsu.elf chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf
+                  mv chiyotatsu64.elf chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf
 
             - name: Create Release and Upload Assets
               uses: softprops/action-gh-release@v2
