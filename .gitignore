@@ -7,7 +7,8 @@ chiyotatsu
 *.exe
 *.elf
 
-src/compiled_proto/*
+src/compiled_proto/*.cc
+src/compiled_proto/*.h
 
 protoc*
 
