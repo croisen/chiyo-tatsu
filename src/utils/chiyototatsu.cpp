@@ -1,3 +1,4 @@
+#include <cctype>
 #include <ctime>
 
 #include "../compiled_proto/backup_category.pb.h"
@@ -12,7 +13,7 @@ using namespace std;
 
 namespace chiyotatsu
 {
-void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
+void chiyototatsu(const Backup &tachiyomiBackup, KotatsuBackup &reference)
 {
     // (To be copied over if there's a reference file)
     // Index, History, Bookmarks, Sources, Settings
@@ -23,17 +24,17 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
     // and tachiyomi doesn't count it's default category too
 
     Categories kCatDef = {
-        .category_id = reference->categories.size(),
+        .category_id = reference.categories.size(),
         .created_at  = (uint64_t)time(NULL),
-        .sort_key    = (int64_t)reference->categories.size(),
+        .sort_key    = (int64_t)reference.categories.size(),
         .title       = "CHSTU - Default",
         .order       = "NEWEST",
         .track       = false,
         .show_in_lib = false,
     };
-    reference->categories.push_back(kCatDef);
-    int64_t origCatCount = reference->categories.size() - 1;
-    for (auto tCat : tachiyomiBackup->categories()) {
+    reference.categories.push_back(kCatDef);
+    int64_t origCatCount = reference.categories.size() - 1;
+    for (auto tCat : tachiyomiBackup.categories()) {
         Categories kCat;
         kCat.created_at  = time(NULL);
         kCat.category_id = origCatCount + tCat.order();
@@ -43,12 +44,12 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
         kCat.show_in_lib = true;
         kCat.track       = false;
         kCat.order       = "NEWEST";
-        kCat.sort_key    = reference->categories.size() - 1;
+        kCat.sort_key    = reference.categories.size() - 1;
 
-        reference->categories.push_back(kCat);
+        reference.categories.push_back(kCat);
     }
 
-    for (auto tManga : tachiyomiBackup->mangabackup()) {
+    for (auto tManga : tachiyomiBackup.mangabackup()) {
         Favourites kManga;
 
         kManga.manga.title  = tManga.title();
@@ -69,7 +70,6 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
         // Rando values again
         kManga.manga.nsfw      = false;
         kManga.manga.rating    = 4.20F;
-        kManga.manga.tags      = {};
         kManga.manga.id        = 0;
         kManga.manga.alt_title = "";
 
@@ -80,11 +80,19 @@ void chiyototatsu(const Backup *tachiyomiBackup, KotatsuBackup *reference)
         kManga.created_at      = time(NULL);
         kManga.manga_id        = 0;
         kManga.sort_key        = 0;
+        for (auto tTag : tManga.genre()) {
+            Tags kTag;
+            kTag.source = source.name;
+            kTag.id     = 0;
+            kTag.title  = tTag;
+            tTag[0]     = tolower(tTag[0]);
+            kTag.key    = tTag;
+            kManga.manga.tags.push_back(kTag);
+        }
 
         // tManga.status(); I dunno what this enum turns out to be
-        kManga.manga.state     = "";
-
-        reference->favourites.push_back(kManga);
+        kManga.manga.state = "";
+        reference.favourites.push_back(kManga);
     }
 }
 } // namespace chiyotatsu

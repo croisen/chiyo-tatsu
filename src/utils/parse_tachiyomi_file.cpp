@@ -15,7 +15,7 @@
 using namespace std;
 using namespace google::protobuf::io;
 
-void gunzip(string filename, vector<uint8_t> *outBuffer)
+void gunzip(const string &filename, vector<uint8_t> &outBuffer)
 {
     vector<uint8_t> compressedBuffer;
     FILE *compressedFp = fopen(filename.c_str(), "rb");
@@ -83,7 +83,7 @@ void gunzip(string filename, vector<uint8_t> *outBuffer)
 
             have = CHUNK - strm.avail_out;
             for (uint64_t i = 0; i < have; i += 1)
-                outBuffer->push_back(out[i]);
+                outBuffer.push_back(out[i]);
         } while (strm.avail_out == 0);
     } while (ret != Z_STREAM_END);
 
@@ -93,11 +93,11 @@ void gunzip(string filename, vector<uint8_t> *outBuffer)
 
 namespace tachiyomi
 {
-Backup parseTachiyomiFile(string input)
+Backup parseTachiyomiFile(string &input)
 {
     Backup tachiyomiBackup;
     vector<uint8_t> tBuffer;
-    gunzip(input, &tBuffer);
+    gunzip(input, tBuffer);
     tachiyomiBackup.ParseFromArray(tBuffer.data(), tBuffer.size());
     return tachiyomiBackup;
 }

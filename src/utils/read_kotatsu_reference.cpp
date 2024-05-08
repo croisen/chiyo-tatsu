@@ -14,7 +14,7 @@ using namespace libzippp;
 using namespace std;
 
 static bool parseKotatsuJson(
-    const char *name, const char *txt, kotatsu::KotatsuBackup *kBackup
+    const char *name, const char *txt, kotatsu::KotatsuBackup &kBackup
 )
 {
     Json::Value root;
@@ -34,7 +34,7 @@ static bool parseKotatsuJson(
             index.app_id      = idx["app_id"].asString();
             index.app_version = idx["app_version"].asUInt64();
             index.created_at  = time(NULL);
-            kBackup->index.push_back(index);
+            kBackup.index.push_back(index);
         }
 
         return true;
@@ -50,7 +50,7 @@ static bool parseKotatsuJson(
             history.percent    = hist["percent"].asDouble();
             history.scroll     = hist["scroll"].asUInt64();
             history.updated_at = hist["updated_at"].asUInt64();
-            kBackup->history.push_back(history);
+            kBackup.history.push_back(history);
         }
 
         return true;
@@ -66,7 +66,7 @@ static bool parseKotatsuJson(
             category.sort_key    = cat["sort_key"].asInt64();
             category.title       = cat["title"].asString();
             category.track       = cat["track"].asBool();
-            kBackup->categories.push_back(category);
+            kBackup.categories.push_back(category);
         }
 
         return true;
@@ -79,7 +79,6 @@ static bool parseKotatsuJson(
             favourite.created_at       = fav["created_at"].asUInt64();
             favourite.manga_id         = fav["manga_id"].asInt64();
             favourite.sort_key         = fav["sort_key"].asInt64();
-
             favourite.manga.alt_title  = fav["manga"]["alt_title"].asString();
             favourite.manga.title      = fav["manga"]["title"].asString();
             favourite.manga.author     = fav["manga"]["author"].asString();
@@ -100,7 +99,7 @@ static bool parseKotatsuJson(
                 favourite.manga.tags.push_back(tags);
             }
 
-            kBackup->favourites.push_back(favourite);
+            kBackup.favourites.push_back(favourite);
         }
 
         return true;
@@ -108,7 +107,7 @@ static bool parseKotatsuJson(
 
     if (strcmp(name, "bookmarks") == 0) {
         chiyotatsuLog(CHWARN, "Idk how to parse bookmarks\n");
-        kBackup->bookmarks = root;
+        kBackup.bookmarks = root;
         return true;
     }
 
@@ -118,7 +117,7 @@ static bool parseKotatsuJson(
             source.enabled  = src["enabled"].asBool();
             source.sort_key = src["sort_key"].asInt64();
             source.source   = src["source"].asString();
-            kBackup->sources.push_back(source);
+            kBackup.sources.push_back(source);
         }
 
         return true;
@@ -126,7 +125,7 @@ static bool parseKotatsuJson(
 
     if (strcmp(name, "settings") == 0) {
         chiyotatsuLog(CHWARN, "Idk how to parse settings\n");
-        kBackup->settings = root;
+        kBackup.settings = root;
         return true;
     }
 
@@ -151,7 +150,7 @@ KotatsuBackup readReference(string reference)
             kModule.getName().c_str()
         );
         parseKotatsuJson(
-            kModule.getName().c_str(), kModule.readAsText().c_str(), &kBackup
+            kModule.getName().c_str(), kModule.readAsText().c_str(), kBackup
         );
     }
 

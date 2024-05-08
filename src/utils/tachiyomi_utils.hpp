@@ -15,7 +15,7 @@ typedef struct TachiyomiSource {
 } TachiyomiSource;
 
 extern const std::map<int64_t, TachiyomiSource> PBoneSourceIDs;
-Backup parseTachiyomiFile(std::string input);
+Backup parseTachiyomiFile(std::string &input);
 } // namespace tachiyomi
 
 #endif // __CHIYOTATSU_TACHIYOMI_SOURCE_IDS__

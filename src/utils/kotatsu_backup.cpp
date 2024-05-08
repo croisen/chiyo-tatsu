@@ -1,3 +1,5 @@
+#include "json/forwards.h"
+#include <iostream>
 #include <string>
 
 #include "libzippp/libzippp.h"
@@ -69,8 +71,8 @@ void saveToFile(string zipName, const KotatsuBackup kotatsuBackup)
         favourites[i]["manga"]["public_url"] =
             kotatsuBackup.favourites[i].manga.public_url;
         favourites[i]["manga"]["url"] = kotatsuBackup.favourites[i].manga.url;
-        for (unsigned int ii                                       = 0;
-             i < kotatsuBackup.favourites[i].manga.tags.size(); i += 1) {
+        for (unsigned int ii                                         = 0;
+             ii < kotatsuBackup.favourites[i].manga.tags.size(); ii += 1) {
             favourites[i]["manga"]["tags"][ii]["id"] =
                 kotatsuBackup.favourites[i].manga.tags[ii].id;
             favourites[i]["manga"]["tags"][ii]["key"] =
@@ -98,8 +100,6 @@ void saveToFile(string zipName, const KotatsuBackup kotatsuBackup)
 
     ZipArchive kZip(zipName);
     kZip.open(ZipArchive::New);
-    // libzip needs the data to be valid until the closing soooo
-    // I may have not needed this cpp wrapper of it
     kZip.addData("index", indexs.data(), indexs.size());
     kZip.addData("history", historys.data(), historys.size());
     kZip.addData("categories", categoriess.data(), categoriess.size());

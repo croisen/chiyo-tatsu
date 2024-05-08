@@ -30,17 +30,8 @@ jobs:
             - name: Compile Chiyotatsu
               run: |
                   make clean
-                  make -j4 elf_release_32
-                  mv chiyotatsu.elf chiyotatsu-x86_32-${{ env.CURRENT_VER }}.elf
-                  make clean
                   make -j4 elf_release_64
                   mv chiyotatsu.elf chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf
-                  make clean
-                  make -j4 exe_release_32
-                  mv chiyotatsu.exe chiyotatsu-x86_64-${{ env.CURRENT_VER }}.exe
-                  make clean
-                  make -j4 exe_release_64
-                  mv chiyotatsu.exe chiyotatsu-x86_64-${{ env.CURRENT_VER }}.exe
 
             - name: Create Release and Upload Assets
               uses: softprops/action-gh-release@v2
@@ -49,9 +40,6 @@ jobs:
                   body: ${{ github.event.head_commit.message }}
                   tag_name: ${{ env.CURRENT_VER }}
                   files: |
-                      chiyotatsu-x86_32-${{ env.CURRENT_VER }}.elf
                       chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf
-                      chiyotatsu-x86_32-${{ env.CURRENT_VER }}.exe
-                      chiyotatsu-x86_64-${{ env.CURRENT_VER }}.exe
                   draft: false
                   prerelease: false

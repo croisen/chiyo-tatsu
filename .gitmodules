@@ -24,3 +24,6 @@
 [submodule "extern/zippp"]
 	path = extern/zippp
 	url = https://github.com/ctabin/libzippp.git
+[submodule "extern/sqlite"]
+	path = extern/sqlite
+	url = https://github.com/sqlite/sqlite.git

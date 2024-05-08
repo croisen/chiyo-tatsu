@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     );
 
     kotatsu::KotatsuBackup kRef = kotatsu::readReference(reference);
-    chiyotatsu::chiyototatsu(&tachiyomi, &kRef);
+    chiyotatsu::chiyototatsu(tachiyomi, kRef);
     kotatsu::saveToFile(output, kRef);
     return 0;
 }

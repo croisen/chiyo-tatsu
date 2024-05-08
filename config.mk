@@ -75,6 +75,7 @@ ABSL_PROTOBUF_AND_ZLIB=\
 					   -ljsoncpp\
 					   -lzippp\
 					   -lzip\
+					   -lsqlite3\
 					   -lz
 
 clean:

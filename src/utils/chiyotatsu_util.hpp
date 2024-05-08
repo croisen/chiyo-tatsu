@@ -15,9 +15,9 @@ void shutdown(void);
 std::string getInput(void);
 std::string getOutput(void);
 std::string getReference(void);
-Backup parseTachiyomiFile(std::string input);
+Backup parseTachiyomiFile(std::string &input);
 void chiyototatsu(
-    const Backup *tachiyomiBackup, kotatsu::KotatsuBackup *reference
+    const Backup &tachiyomiBackup, kotatsu::KotatsuBackup &reference
 );
 } // namespace chiyotatsu
 

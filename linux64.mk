@@ -1,7 +1,8 @@
 include config.mk
 
 ELF				= chiyotatsu64.elf
-LIN64			= ${PROJECT_ROOT}libs_lin/64/lib/libz.a\
+LIN64			= ${PROJECT_ROOT}libs_lin/64/lib/libsqlite3.a\
+				  ${PROJECT_ROOT}libs_lin/64/lib/libz.a\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libabsl_civil_time.a\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libprotobuf.a\
 				  ${PROJECT_ROOT}libs_lin/64/lib/libzippp.a\
@@ -145,7 +146,7 @@ ${PROJECT_ROOT}libs_lin/64/lib/libzip.a: ${PROJECT_ROOT}libs_lin/64/lib/libz.a
 		mkdir -p ${PROJECT_ROOT}libs_lin/64/include;\
 		mkdir -p ${PROJECT_ROOT}libs_lin/64/lib;\
 	fi
-	@cmake -B ${PROJECT_ROOT}extern/zip/build/lin64dyn\
+	@cmake -B ${PROJECT_ROOT}extern/zip/build/lin64\
 		-DCMAKE_INSTALL_PREFIX=${PROJECT_ROOT}libs_lin/64\
 		-DCMAKE_PREFIX_PATH=${PROJECT_ROOT}libs_lin/64\
 		-DCMAKE_BUILD_TYPE=Release\
@@ -157,11 +158,17 @@ ${PROJECT_ROOT}libs_lin/64/lib/libzip.a: ${PROJECT_ROOT}libs_lin/64/lib/libz.a
 		-DENABLE_MBEDTLS=OFF\
 		-DENABLE_OPENSSL=OFF\
 		-DENABLE_BZIP2=OFF\
-LIN32			= ${PROJECT_ROOT}libs_lin/32/lib/libz.a ${PROJECT_ROOT}libs_lin/32/lib/libabsl_civil_time.a ${PROJECT_ROOT}libs_lin/32/lib/libprotobuf.a
 		-DENABLE_LZMA=OFF\
 		-DENABLE_ZSTD=OFF\
 		${PROJECT_ROOT}extern/zip/
-	@${MAKE} -C ${PROJECT_ROOT}extern/zip/build/lin64dyn install
+	@${MAKE} -C ${PROJECT_ROOT}extern/zip/build/lin64 install
+	@echo "Built target $@"
+
+${PROJECT_ROOT}libs_lin/64/lib/libsqlite3.a:
+	@cd ${PROJECT_ROOT}extern/sqlite; ./configure\
+		--prefix=${PROJECT_ROOT}libs_lin/64\
+		--datadir=${PROJECT_ROOT}libs_lib/64/
+	@${MAKE} -C ${PROJECT_ROOT}extern/sqlite install
 	@echo "Built target $@"
 
 .PHONY: default clean elf_debug elf_release
