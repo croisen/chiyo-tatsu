@@ -6,13 +6,12 @@ import (
 	"io"
 	"os"
 
-	"github.com/croisen/chiyo-tatsu/proto_files_go/tachiyomi"
+	"github.com/croisen/chiyo-tatsu/utils/tachiyomi_backups"
 	"google.golang.org/protobuf/proto"
 )
 
-func TGunZip(input *os.File) *tachiyomi.Backup {
-	var protobuf_tachiyomi tachiyomi.Backup
-	var decompressed_buffer []byte
+func TGunZip(input *os.File) *tachiyomi_backups.Backup {
+	protobuf_tachiyomi := &tachiyomi_backups.Backup{}
 
 	if input == nil {
 		fmt.Println("Input file (tachiyomi backup) was not passed with -i or --input")
@@ -32,15 +31,15 @@ func TGunZip(input *os.File) *tachiyomi.Backup {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println("Read", len(read), "Bytes from", input.Name())
 
-	protobuf_tachiyomi.Reset()
-	err = proto.Unmarshal(decompressed_buffer, &protobuf_tachiyomi)
+	fmt.Println("Read", len(read), "Bytes from", input.Name())
+	// I was using the wrong buffer all along
+	err = proto.Unmarshal(read, protobuf_tachiyomi)
 	if err != nil {
 		fmt.Println("Error parsing file", input.Name())
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	return &protobuf_tachiyomi
+	return protobuf_tachiyomi
 }

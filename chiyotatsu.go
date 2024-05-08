@@ -16,12 +16,8 @@ func main() {
 	}
 
 	tyomi_protobuf := tachiyomi_gunzip.TGunZip(arg.Input)
-
-	// Dunno why it returns empty to my backup file just yet
-	fmt.Println(tyomi_protobuf.GetMangaBackup())
-	fmt.Println(tyomi_protobuf.GetCategories())
-	fmt.Println(tyomi_protobuf.GetBrokenSources())
-	fmt.Println(tyomi_protobuf.GetSources())
-	fmt.Println(tyomi_protobuf.GetPreferences())
-	fmt.Println(tyomi_protobuf.GetSourcePreferences())
+	fmt.Println(tyomi_protobuf)
+	for i := 0; i < len(tyomi_protobuf.MangaBackup); i += 1 {
+		fmt.Println(tyomi_protobuf.MangaBackup[i].Title)
+	}
 }
