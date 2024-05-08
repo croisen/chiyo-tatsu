@@ -29,8 +29,8 @@ jobs:
 
             - name: Compile Chiyotatsu
               run: |
-                  make clean
-                  make -j4 elf_release_64
+                  make -f linux64.mk clean
+                  make -f linux64.mk -j4 elf_release
                   mv chiyotatsu.elf chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf
 
             - name: Create Release and Upload Assets
