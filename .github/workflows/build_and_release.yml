@@ -3,7 +3,7 @@ name: Compile ChiyoTatsu
 on:
     push:
         branches:
-            - main
+            - in_go
 
 jobs:
     create_release:

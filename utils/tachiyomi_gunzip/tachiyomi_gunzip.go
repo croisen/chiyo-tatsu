@@ -10,15 +10,11 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func TGunZip(input *string) *tachiyomi_backups.Backup {
+func TGunZip(input string) *tachiyomi_backups.Backup {
 	protobuf_tachiyomi := &tachiyomi_backups.Backup{}
 
-	if input == nil {
-		fmt.Println("Input file (tachiyomi backup) was not passed with -i or --input")
-		os.Exit(1)
-	}
-
-	inputFile, err := os.Open(*input)
+	inputFile, err := os.Open(input)
+	defer inputFile.Close()
 	if err != nil {
 		fmt.Println("Cannot read file: ", input)
 		os.Exit(1)

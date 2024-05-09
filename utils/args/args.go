@@ -3,6 +3,7 @@ package args
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/akamensky/argparse"
 )
@@ -23,6 +24,15 @@ func CreateArgs() *ChiyoTatsuArgs {
 	if err != nil {
 		fmt.Print(parser.Usage(err))
 		os.Exit(1)
+	}
+
+	date := time.Now()
+	day := fmt.Sprintf("%02d", date.Day())
+	month := fmt.Sprintf("%02d", date.Month())
+	year := fmt.Sprintf("%04d", date.Year())
+	if output == nil || len(*output) == 0 {
+		output1 := "kotatsu_" + day + month + year + ".bk.zip"
+		output = &output1
 	}
 
 	args := ChiyoTatsuArgs{
