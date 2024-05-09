@@ -1,19 +1,9 @@
-*.tachibk
-*.bk.zip
-sample*.json
+*.elf
+*.exe
 
-valgrind_log
+samples/*.tachibk
+samples/*.bk.zip
+samples/*.json
 
-*.a
-*.so
-
-*.lib
-*.exp
-*.dll
-*.pdb
-
-built_libs/remnants/*
-
-chiyotatsu.exe
-chiyotatsu.elf
-*.o
+zig-cache/
+zig-out/

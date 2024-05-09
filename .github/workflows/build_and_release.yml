@@ -28,20 +28,11 @@ jobs:
             - name: Compile ChiyoTatsu [Release]
               run: |
                   export PATH=$PATH:/usr/local/go/bin
-                  #export CGO_ENABLED=1
-                  #GOOS=android GOARCH=amd64 go build -ldflags="-s -w" -o "and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
-                  #GOOS=android GOARCH=386   go build -ldflags="-s -w" -o "and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf"  ./chiyotatsu.go
-                  #GOOS=darwin  GOARCH=amd64 go build -ldflags="-s -w" -o "mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app" ./chiyotatsu.go
-                  #GOOS=darwin  GOARCH=386   go build -ldflags="-s -w" -o "mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app"  ./chiyotatsu.go
-                  GOOS=linux   GOARCH=amd64 go build -ldflags="-s -w" -o "lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
-                  GOOS=linux   GOARCH=386   go build -ldflags="-s -w" -o "lin-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf"  ./chiyotatsu.go
-                  GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o "win-amd64-chiyotatsu-${{ env.CURRENT_VER }}.exe" ./chiyotatsu.go
-                  GOOS=windows GOARCH=386   go build -ldflags="-s -w" -o "win-i386-chiyotatsu-${{ env.CURRENT_VER }}.exe"  ./chiyotatsu.go
+                  GOOS=linux   GOARCH=amd64 go build -ldflags="-s -w" -o "chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
+                  GOOS=linux   GOARCH=386   go build -ldflags="-s -w" -o "chiyotatsu-x86_32-${{ env.CURRENT_VER }}.elf" ./chiyotatsu.go
+                  GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o "chiyotatsu-x86_64-${{ env.CURRENT_VER }}.exe" ./chiyotatsu.go
+                  GOOS=windows GOARCH=386   go build -ldflags="-s -w" -o "chiyotatsu-x86_32-${{ env.CURRENT_VER }}.exe" ./chiyotatsu.go
 
-              # and-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
-              # and-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
-              # mac-i386-chiyotatsu-${{ env.CURRENT_VER }}.app
-              # mac-amd64-chiyotatsu-${{ env.CURRENT_VER }}.app
             - name: Create Release and Upload Assets
               uses: softprops/action-gh-release@v2
               with:
@@ -49,9 +40,9 @@ jobs:
                   body: ${{ github.event.head_commit.message }}
                   tag_name: ${{ env.CURRENT_VER }}
                   files: |
-                      lin-amd64-chiyotatsu-${{ env.CURRENT_VER }}.elf
-                      lin-i386-chiyotatsu-${{ env.CURRENT_VER }}.elf
-                      win-amd64-chiyotatsu-${{ env.CURRENT_VER }}.exe
-                      win-i386-chiyotatsu-${{ env.CURRENT_VER }}.exe
+                      chiyotatsu-x86_64-${{ env.CURRENT_VER }}.elf
+                      chiyotatsu-x86_32-${{ env.CURRENT_VER }}.elf
+                      chiyotatsu-x86_64-${{ env.CURRENT_VER }}.exe
+                      chiyotatsu-x86_32-${{ env.CURRENT_VER }}.exe
                   draft: false
                   prerelease: false
