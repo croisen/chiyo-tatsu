@@ -8,11 +8,11 @@ import (
 
 	"github.com/croisen/chiyo-tatsu/utils/kotatsu_backups"
 	"github.com/croisen/chiyo-tatsu/utils/tachiyomi_backups"
-	"github.com/croisen/chiyo-tatsu/utils/tachiyomi_pbone"
+	"github.com/croisen/chiyo-tatsu/utils/tachiyomi_source"
 )
 
 func Chiyototatsu(
-	tBackup *tachiyomi_backups.Backup, kBackup *kotatsu_backups.Backup, sources tachiyomi_pbone.MTachiyomiSource) *kotatsu_backups.Backup {
+	tBackup *tachiyomi_backups.Backup, kBackup *kotatsu_backups.Backup, sources tachiyomi_source.MTachiyomiSource) *kotatsu_backups.Backup {
 	kCats := kBackup.Categories
 	kCatDef := kotatsu_backups.Category{
 		Category_id: uint64(len(kCats)) + 1,
@@ -57,7 +57,7 @@ func Chiyototatsu(
 			continue
 		}
 
-		var usedSource tachiyomi_pbone.Source
+		var usedSource tachiyomi_source.Source
 		for _, s := range source.Sources {
 			if fmt.Sprint(tManga.Source) == s.Id {
 				usedSource = s
