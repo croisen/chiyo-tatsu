@@ -14,11 +14,11 @@ func TGunZip(input string) *tachiyomi_backups.Backup {
 	protobuf_tachiyomi := &tachiyomi_backups.Backup{}
 
 	inputFile, err := os.Open(input)
-	defer inputFile.Close()
 	if err != nil {
 		fmt.Println("Cannot read file: ", input)
 		os.Exit(1)
 	}
+	defer inputFile.Close()
 
 	gzip_data, err := gzip.NewReader(inputFile)
 	if err != nil {
