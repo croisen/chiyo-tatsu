@@ -7,6 +7,7 @@ import (
 	"github.com/croisen/chiyo-tatsu/utils/chiyototatsu"
 	"github.com/croisen/chiyo-tatsu/utils/kotatsu_backups"
 	"github.com/croisen/chiyo-tatsu/utils/tachiyomi_gunzip"
+	"github.com/croisen/chiyo-tatsu/utils/tachiyomi_pbone"
 )
 
 func main() {
@@ -14,9 +15,12 @@ func main() {
 
 	fmt.Println("Input File: ", *arg.Input)
 	fmt.Println("Ref File:   ", *arg.Reference)
-	fmt.Println("Output File:", *arg.Output, "\n")
+	fmt.Println("Source File:", *arg.Source)
+	fmt.Print("Output File:", *arg.Output, "\n\n")
+
 	tBackup := tachiyomi_gunzip.TGunZip(*arg.Input)
 	kBackup := kotatsu_backups.ReadReference(*arg.Reference)
-	kBackup = chiyototatsu.Chiyototatsu(tBackup, kBackup)
+	sources := tachiyomi_pbone.ReadTachiyomiSources(*arg.Source)
+	kBackup = chiyototatsu.Chiyototatsu(tBackup, kBackup, sources)
 	kotatsu_backups.SaveToFile(*arg.Output, kBackup)
 }

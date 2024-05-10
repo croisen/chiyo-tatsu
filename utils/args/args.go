@@ -12,6 +12,7 @@ type ChiyoTatsuArgs struct {
 	Input     *string
 	Output    *string
 	Reference *string
+	Source    *string
 }
 
 func CreateArgs() *ChiyoTatsuArgs {
@@ -19,6 +20,7 @@ func CreateArgs() *ChiyoTatsuArgs {
 	input := parser.String("i", "input", &argparse.Options{Required: true, Help: "Tachiyomi backup file"})
 	output := parser.String("o", "output", &argparse.Options{Required: false, Help: "Kotatsu backup file"})
 	reference := parser.String("r", "reference", &argparse.Options{Required: true, Help: "Kotatsu backup file"})
+	source := parser.String("s", "sources", &argparse.Options{Required: true, Help: "The json file in the chiyo-tatsu github repo pls"})
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -39,6 +41,7 @@ func CreateArgs() *ChiyoTatsuArgs {
 		Input:     input,
 		Output:    output,
 		Reference: reference,
+		Source:    source,
 	}
 
 	return &args
