@@ -29,12 +29,12 @@ type FullSource struct {
 
 type MTachiyomiSource map[int64]FullSource
 
-func ReadTachiyomiSources(sourceJson string) MTachiyomiSource {
+func ReadTachiyomiSources(sourceJson []byte) MTachiyomiSource {
 	// I'm tired of naming variables now
 	m := make(MTachiyomiSource)
 	var a []FullSource
 
-	err := json.Unmarshal([]byte(sourceJson), &a)
+	err := json.Unmarshal(sourceJson, &a)
 	if err != nil {
 		panic(err)
 	}

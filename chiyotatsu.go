@@ -16,7 +16,6 @@ func main() {
 
 	fmt.Println("Input File: ", *arg.Input)
 	fmt.Println("Ref File:   ", *arg.Reference)
-	fmt.Println("Source File:", *arg.Source)
 	fmt.Print("Output File:", *arg.Output, "\n\n")
 	tBackup := tachiyomi_gunzip.TGunZip(*arg.Input)
 	kBackup := kotatsu_backups.ReadReference(*arg.Reference)
